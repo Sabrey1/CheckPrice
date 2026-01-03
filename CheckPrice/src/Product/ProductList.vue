@@ -1,7 +1,8 @@
 <template>
   <div>
+    {{ isMobile }}
     <!-- SEARCH + ADD -->
-    <div class="flex justify-content-between mb-3">
+    <div class="flex justify-content-between mb-3 p-3">
       <IconField>
         <InputIcon class="pi pi-search" />
         <InputText v-model="searchTerm" placeholder="Search product" />
@@ -70,13 +71,13 @@
       <Column field="product_name" header="ឈ្មោះ" />
       <Column field="price" header="តម្លៃ" />
 
-      <Column header="ថ្ងៃបង្កើត">
+      <Column v-if="!isMobile" header="ថ្ងៃបង្កើត"  >
         <template #body="slotProps">
           {{ new Date(slotProps.data.created_at).toLocaleDateString() }}
         </template>
       </Column>
 
-      <Column header="សកម្មភាព" style="width: 340px">
+      <Column v-if="!isMobile" header="សកម្មភាព" style="width: 340px">
         <template #body="slotProps">
           <div class="flex gap-2">
             <ProductView :product="slotProps.data" />
@@ -113,6 +114,9 @@ import IconField from 'primevue/iconfield'
 import InputIcon from 'primevue/inputicon'
 import ProductView from '@/Product/ProductView.vue'
 
+import {useDevice} from '@/hook/useDevice.js'
+
+const { isMobile, deviceName } = useDevice()
 /* STATE */
 const visible = ref(false)
 const loading = ref(false)

@@ -31,14 +31,14 @@
         </li>
       </ul>
 
-      <!-- <div class="p-2 border-top-1 border-700">
-        <RouterLink
+      <div class="p-2 border-top-1 border-700">
+        <!-- <RouterLink
           to="/settings"
           class="flex align-items-center p-3 border-round hover:surface-700 text-white no-underline"
         >
           <i class="pi pi-cog mr-3"></i>
           <span>Settings</span>
-        </RouterLink>
+        </RouterLink> -->
         <RouterLink
           to="/login"
            @click.native="handleLogout"
@@ -47,7 +47,7 @@
           <i class="pi pi-sign-out mr-3"></i>
           <span>Logout</span>
         </RouterLink>
-      </div> -->
+      </div>
     </div>
 
     <div

@@ -1,13 +1,9 @@
 <template>
   <div>
     <Toast />
-
-     <div class="flex justify-content-end">
+     <div class="flex justify-content-end p-3">
       <Button label="បន្ថែមប្រភេទ" icon="pi pi-plus" severity="success" class="mb-3 " @click="openAdd" />
      </div>
-    
-
-     
     <Dialog
       v-model:visible="visible"
       modal
@@ -45,7 +41,7 @@
       :value="categories"
       stripedRows
       :loading="loading"
-      tableStyle="min-width: 50rem"
+      
     >
       <Column header="ល.រ">
         <template #body="slotProps">
@@ -56,40 +52,60 @@
       <Column field="category_name" header="ឈ្មោះប្រភេទ" />
       <Column field="description" header="ពិពណ៌នា" />
 
-      <Column header="ថ្ងៃបង្កើត">
+      <Column
+        v-if="!isMobile"
+        header="ថ្ងៃបង្កើត"
+      >
         <template #body="slotProps">
           {{ new Date(slotProps.data.created_at).toLocaleDateString() }}
         </template>
       </Column>
-      <ConfirmDialog />
+
       <Column header="សកម្មភាព" style="width: 370px">
         <template #body="slotProps">
-          <div class="flex gap-2">
-            <CategoryView :category="slotProps.data" />
-          <Button
-            icon="pi pi-pencil"
-            label="កែប្រែ"
-            class="p-button-primary"
-            @click="openEdit(slotProps.data)"
-          />
+          <div class="flex gap-2 items-center">
+            <!-- Desktop: show full buttons -->
+            <template v-if="!isMobile">
+              <CategoryView :category="slotProps.data" />
+              <Button
+                icon="pi pi-pencil"
+                label="កែប្រែ"
+                class="p-button-primary"
+                @click="openEdit(slotProps.data)"
+              />
+              <Button
+                icon="pi pi-trash"
+                label="លុប"
+                class="p-button-danger"
+                @click="confirmDelete(slotProps.data)"
+              />
+            </template>
 
-          <Button
-            icon="pi pi-trash"
-            label="លុប"
-            class="p-button-danger"
-            @click="confirmDelete(slotProps.data)"
-          />
+            <!-- Mobile: show 3-dot menu -->
+            <template v-else>
+              <Button
+                icon="pi pi-ellipsis-v"
+                text
+                rounded
+                @click="mobileMenu(slotProps.data, $event)"
+              />
+            </template>
           </div>
-          
         </template>
       </Column>
     </DataTable>
+
+    <ConfirmDialog />
+    <Menu ref="menu" :model="menuItems" :popup="true" />
+
   </div>
 </template>
+
 <script setup>
 import { ref, onMounted } from 'vue'
 import { supabase } from '@/supabase'
 import { useToast } from 'primevue/usetoast'
+import { useDevice } from '@/hook/useDevice.js'
 
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
@@ -101,7 +117,13 @@ import CategoryView from '@/Category/CategoryView.vue'
 import ConfirmDialog from 'primevue/confirmdialog'
 import { useConfirm } from 'primevue/useconfirm'
 
+import Menu from 'primevue/menu'
+
+ 
+const { isMobile, deviceName } = useDevice()
+
 const toast = useToast()
+const confirm = useConfirm()
 
 const visible = ref(false)
 const categories = ref([])
@@ -110,10 +132,37 @@ const saving = ref(false)
 
 const categoryName = ref('')
 const description = ref('')
-const editingCategory = ref(null) // ⭐ ADD / EDIT FLAG
-const confirm = useConfirm()
+const editingCategory = ref(null) 
 
-// LOAD DATA
+const menu = ref(null)
+const menuItems = ref([])
+const selectedCategory = ref(null)
+
+const mobileMenu = (category, event) => {
+  selectedCategory.value = category
+  
+   
+  menuItems.value = [
+    // {
+    //   label: 'មើល',
+    //   icon: 'pi pi-eye',
+    //   command: () => openView(selectedCategory.value)
+    // },
+    {
+      label: 'កែប្រែ',
+      icon: 'pi pi-pencil',
+      command: () => openEdit(selectedCategory.value)
+    },
+    {
+      label: 'លុប',
+      icon: 'pi pi-trash',
+      command: () => confirmDelete(selectedCategory.value)
+    }
+  ]
+
+  menu.value.toggle(event) 
+}
+
 onMounted(async () => {
   loading.value = true
 
@@ -131,7 +180,6 @@ onMounted(async () => {
   loading.value = false
 })
 
-// OPEN ADD
 const openAdd = () => {
   editingCategory.value = null
   categoryName.value = ''
@@ -139,7 +187,6 @@ const openAdd = () => {
   visible.value = true
 }
 
-// OPEN EDIT
 const openEdit = (category) => {
   editingCategory.value = category
   categoryName.value = category.category_name
@@ -147,13 +194,11 @@ const openEdit = (category) => {
   visible.value = true
 }
 
-// CLOSE
 const closeDialog = () => {
   visible.value = false
   editingCategory.value = null
 }
 
-// SAVE (ADD OR EDIT)
 const saveCategory = async () => {
   if (!categoryName.value) {
     toast.add({
@@ -167,8 +212,6 @@ const saveCategory = async () => {
 
   try {
     saving.value = true
-
-    // ✏️ EDIT
     if (editingCategory.value) {
       const { error } = await supabase
         .from('Category')
@@ -179,8 +222,6 @@ const saveCategory = async () => {
         .eq('id', editingCategory.value.id)
 
       if (error) throw error
-
-      // update UI
       const index = categories.value.findIndex(
         c => c.id === editingCategory.value.id
       )
@@ -196,7 +237,7 @@ const saveCategory = async () => {
         life: 3000
       })
     }
-    // ➕ ADD
+   
     else {
       const { data, error } = await supabase
         .from('Category')
@@ -243,7 +284,6 @@ const confirmDelete = (category) => {
     icon: 'pi pi-exclamation-triangle',
     acceptLabel: 'លុប',
     rejectLabel: 'បោះបង់',
-
     accept: () => deleteCategory(category)
   })
 }
@@ -258,8 +298,6 @@ const deleteCategory = async (category) => {
       .eq('id', category.id)
 
     if (error) throw error
-
-    // remove from UI instantly
     categories.value = categories.value.filter(
       c => c.id !== category.id
     )
