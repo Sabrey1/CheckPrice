@@ -63,7 +63,7 @@
          
       </div>
 
-      <div class="p-4 pt-16 overflow-auto h-[calc(100vh-64px)]">
+      <div class=" pt-16 overflow-auto h-[calc(100vh-64px)]">
       <!-- <div> -->
         <router-view />
       </div>

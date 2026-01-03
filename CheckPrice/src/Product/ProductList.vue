@@ -240,3 +240,11 @@ const deleteProduct = async (product) => {
   }
 }
 </script>
+
+<style scoped>
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+</style>
