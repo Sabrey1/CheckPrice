@@ -61,7 +61,7 @@
         </template>
       </Column>
 
-      <Column class="p-0"  headerClass=" justify-content-end flex"   >
+      <Column class="p-0"  headerClass=" justify-content-end  "   >
         <template #body="slotProps">
           <div class="flex gap-2 items-center align-items-center justify-content-end" >
             <!-- Desktop: show full buttons -->
