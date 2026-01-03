@@ -49,8 +49,8 @@
         </template>
       </Column>
 
-      <Column field="category_name" header="ឈ្មោះប្រភេទ" />
-      <Column field="description" header="ពិពណ៌នា" />
+      <Column field="category_name" class="p-0" header="ឈ្មោះប្រភេទ" />
+      <Column field="description" v-if="!isMobile" header="ពិពណ៌នា" />
 
       <Column
         v-if="!isMobile"
@@ -61,9 +61,9 @@
         </template>
       </Column>
 
-      <Column header="សកម្មភាព" style="width: 370px">
+      <Column class="p-0"  headerClass=" justify-content-end flex"   >
         <template #body="slotProps">
-          <div class="flex gap-2 items-center">
+          <div class="flex gap-2 items-center align-items-center justify-content-end" >
             <!-- Desktop: show full buttons -->
             <template v-if="!isMobile">
               <CategoryView :category="slotProps.data" />
@@ -82,13 +82,16 @@
             </template>
 
             <!-- Mobile: show 3-dot menu -->
-            <template v-else>
-              <Button
+            <template v-else >
+              <div class="flex align-items-center justify-content-center rounded-full w-full">
+                <Button
                 icon="pi pi-ellipsis-v"
                 text
                 rounded
                 @click="mobileMenu(slotProps.data, $event)"
               />
+              </div>
+              
             </template>
           </div>
         </template>
@@ -322,3 +325,9 @@ const deleteCategory = async (category) => {
   }
 }
 </script>
+
+<style scoped>
+  .align-middle {
+  vertical-align: middle;
+}
+</style>

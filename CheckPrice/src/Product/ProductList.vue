@@ -1,19 +1,25 @@
 <template>
   <div>
-    {{ isMobile }}
+    
     <!-- SEARCH + ADD -->
-    <div class="flex justify-content-between mb-3 p-3">
-      <IconField>
+    <div class="flex align-items-center gap-2 justify-content-between mb-3 p-3">
+      <div>
+         <IconField>
         <InputIcon class="pi pi-search" />
-        <InputText v-model="searchTerm" placeholder="Search product" />
+        <InputText v-model="searchTerm" placeholder="ស្វែងរកផលិតផល" />
       </IconField>
+      </div>
+     
 
-      <Button
+      <div>
+        <Button
         label="បន្ថែមផលិតផល"
         icon="pi pi-plus"
         severity="success"
         @click="openAdd"
       />
+      </div>
+      
     </div>
 
     <!-- ADD / EDIT DIALOG -->
@@ -46,7 +52,7 @@
       </div>
 
       <div class="flex justify-end gap-2">
-        <Button label="Cancel" severity="secondary" @click="closeDialog" />
+        <Button label="បោះបង់" severity="secondary" @click="closeDialog" />
         <Button
           :label="editingProduct ? 'កែប្រែ' : 'រក្សាទុក'"
           :loading="saving"
@@ -60,7 +66,7 @@
       :value="filteredProducts"
       stripedRows
       :loading="loading"
-      tableStyle="min-width: 50rem"
+     
     >
       <Column header="ល.រ">
         <template #body="slotProps">
@@ -77,26 +83,46 @@
         </template>
       </Column>
 
-      <Column v-if="!isMobile" header="សកម្មភាព" style="width: 340px">
+      
+      <Column    headerClass=" justify-content-end  "   >
         <template #body="slotProps">
-          <div class="flex gap-2">
-            <ProductView :product="slotProps.data" />
-            <Button
+          <div class="flex gap-2 items-center align-items-center justify-content-end" >
+            <!-- Desktop: show full buttons -->
+            <template v-if="!isMobile">
+              <ProductView :product="slotProps.data" />
+              <Button
               icon="pi pi-pencil"
               label="កែប្រែ"
               class="p-button-primary"
               @click="openEdit(slotProps.data)"
             />
-            <Button
+              <Button
               icon="pi pi-trash"
               label="លុប"
               class="p-button-danger"
               @click="deleteProduct(slotProps.data)"
             />
+            </template>
+
+            <!-- Mobile: show 3-dot menu -->
+            <template v-else >
+              <div class="flex align-items-center justify-content-center rounded-full w-full">
+                <Button
+                icon="pi pi-ellipsis-v"
+                text
+                rounded
+                @click="mobileMenu(slotProps.data, $event)"
+              />
+              </div>
+              
+            </template>
           </div>
         </template>
       </Column>
     </DataTable>
+
+    <ConfirmDialog />
+    <Menu ref="menu" :model="menuItems" :popup="true" />
   </div>
 </template>
 
@@ -113,7 +139,10 @@ import Select from 'primevue/select'
 import IconField from 'primevue/iconfield'
 import InputIcon from 'primevue/inputicon'
 import ProductView from '@/Product/ProductView.vue'
+import ConfirmDialog from 'primevue/confirmdialog'
+// import { useConfirm } from 'primevue/useconfirm'
 
+import Menu from 'primevue/menu'
 import {useDevice} from '@/hook/useDevice.js'
 
 const { isMobile, deviceName } = useDevice()
@@ -121,16 +150,44 @@ const { isMobile, deviceName } = useDevice()
 const visible = ref(false)
 const loading = ref(false)
 const saving = ref(false)
-
+// const confirm = useConfirm()
 const products = ref([])
 const categories = ref([])
-
+const menu = ref(null)
+const menuItems = ref([])
 const productName = ref('')
 const productPrice = ref('')
 const selectedCategory = ref(null)
 
 const editingProduct = ref(null)
 const searchTerm = ref('')
+const selectedProduct = ref(null)
+
+const mobileMenu = (product, event) => {
+  selectedProduct.value = product
+  
+   
+  menuItems.value = [
+    // {
+    //   label: 'មើល',
+    //   icon: 'pi pi-eye',
+    //   command: () => openView(selectedCategory.value)
+    // },
+    {
+      label: 'កែប្រែ',
+      icon: 'pi pi-pencil',
+      command: () => openEdit(selectedProduct.value)
+    },
+    {
+      label: 'លុប',
+      icon: 'pi pi-trash',
+      command: () => deleteProduct(selectedProduct.value)
+    }
+  ]
+
+  menu.value.toggle(event) 
+}
+
 
 /* FETCH DATA */
 const fetchProducts = async () => {
