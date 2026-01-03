@@ -13,11 +13,11 @@
          
         <li>
           <RouterLink
-            to="/product"
+            to="/"
             class="flex align-items-center p-3 border-round hover:surface-700 text-white no-underline"
           >
             <i class="pi pi-box mr-3"></i>
-            <span>Product</span>
+            <span>ផលិតផល</span>
           </RouterLink>
         </li>
         <li>
@@ -31,7 +31,7 @@
         </li>
       </ul>
 
-      <div class="p-2 border-top-1 border-700">
+      <!-- <div class="p-2 border-top-1 border-700">
         <RouterLink
           to="/settings"
           class="flex align-items-center p-3 border-round hover:surface-700 text-white no-underline"
@@ -47,7 +47,7 @@
           <i class="pi pi-sign-out mr-3"></i>
           <span>Logout</span>
         </RouterLink>
-      </div>
+      </div> -->
     </div>
 
     <div

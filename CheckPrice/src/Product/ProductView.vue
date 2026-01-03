@@ -24,7 +24,7 @@
             <td>{{ product.product_name }}</td>
           </tr>
           <tr>
-            <th>ពិពណ៌នា</th>
+            <th>តម្លៃ</th>
             <td>{{ product.price || '-' }}</td>
           </tr>
           <tr>

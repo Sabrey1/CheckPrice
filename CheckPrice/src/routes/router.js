@@ -10,18 +10,19 @@ const routes = [
 //     name: 'Home',
 //     component: Home
 //   },
+{
+    path: '/',
+    name: 'Products',
+    component: Products,
+    meta: { title: 'បញ្ជីផលិតផល' }
+  },
   {
     path: '/category',
     name: 'CategoryList',
     component: CategoryList,
     meta: { title: 'ឈ្មោះប្រភេទ' }
   },
-  {
-    path: '/product',
-    name: 'Products',
-    component: Products,
-    meta: { title: 'Product List' }
-  },
+  
   // Catch all unmatched routes
 //   {
 //     path: '/:pathMatch(.*)*',
