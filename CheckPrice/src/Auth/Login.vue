@@ -1,24 +1,27 @@
-<!-- <template>
+ 
+<template>
   <div class="login-container">
     <Card class="login-card">
       <template #title>
-        <h2 class="m-0 text-center">Login</h2>
+        <h2 class="text-center m-0">Sign In</h2>
       </template>
 
       <template #content>
-        <Message v-if="errorMsg" severity="error" class="mb-3">
-          {{ errorMsg }}
-        </Message>
-
         <div class="field">
           <label>Email</label>
-          <InputText v-model="email" class="w-full" />
+          <InputText
+            v-model="email"
+            type="email"
+            placeholder="Enter your email"
+            class="w-full"
+          />
         </div>
 
         <div class="field mt-3">
           <label>Password</label>
           <Password
             v-model="password"
+            placeholder="Enter your password"
             toggleMask
             class="w-full"
             inputClass="w-full"
@@ -27,86 +30,104 @@
         </div>
 
         <Button
-          label="Login"
+          label="Sign In"
+          icon="pi pi-sign-in"
           class="w-full mt-4"
           :loading="loading"
-          @click="login"
+          @click="signIn"
         />
+
+        <p v-if="errorMsg" class="error-text">
+          {{ errorMsg }}
+        </p>
       </template>
     </Card>
   </div>
 </template>
 
+
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { supabase } from '@/supabase'
-
 import Card from 'primevue/card'
 import InputText from 'primevue/inputtext'
 import Password from 'primevue/password'
 import Button from 'primevue/button'
-import Message from 'primevue/message'
 
 const router = useRouter()
 
 const email = ref('')
 const password = ref('')
-const loading = ref(false)
 const errorMsg = ref('')
+const loading = ref(false)
 
-const login = async () => {
+const signIn = async () => {
   loading.value = true
   errorMsg.value = ''
 
-  // 1️⃣ LOGIN (auth.users)
   const { data, error } = await supabase.auth.signInWithPassword({
-    email: email.value.trim().toLowerCase(),
+    email: email.value,
     password: password.value,
   })
 
-  if (error) {
-    errorMsg.value = error.message
-    loading.value = false
-    return
-  }
-
-  // 2️⃣ LOAD USER FROM 01_users
-  const { data: user, error: userError } = await supabase
-    .from('01_users')
-    .select('*')
-    .eq('id', data.user.id)
-    .single()
-
   loading.value = false
 
-  if (userError) {
-    errorMsg.value = 'User profile not found'
+  if (error) {
+    errorMsg.value = error.message
     return
   }
 
-  // ✅ SUCCESS → USE 01_users DATA
-  console.log('Logged in user:', user)
+  const user = data.user
+  if (!user) {
+    errorMsg.value = 'User not found'
+    return
+  }
 
-  router.push('/dashboard')
+  const { data: profile, error: profileError } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single()
+
+  
+  if (profileError || !profile) {
+    errorMsg.value = 'Profile not found. Contact admin.'
+    return
+  }
+    router.push('/')
+   
 }
 </script>
 
+
+
+
 <style scoped>
 .login-container {
+  min-height: 100vh;
   display: flex;
-  justify-content: center;
   align-items: center;
-  height: 100vh;
-  background: #f5f7fa;
+  justify-content: center;
+  background: linear-gradient(135deg, #eef2ff, #f8fafc);
 }
+
 .login-card {
-  width: 350px;
+  width: 360px;
+  padding: 1rem;
 }
 
 .field label {
-  display: block;
-  margin-bottom: 0.5rem;
   font-weight: 600;
+  margin-bottom: 0.5rem;
+  display: block;
 }
+
+.error-text {
+  color: #ef4444;
+  text-align: center;
+  margin-top: 1rem;
+  font-size: 0.875rem;
+}
+ 
 </style>
