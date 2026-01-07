@@ -1,25 +1,22 @@
 <template>
   <div>
-    
     <!-- SEARCH + ADD -->
     <div class="flex align-items-center gap-2 justify-content-between mb-3 p-3">
       <div>
-         <IconField>
-        <InputIcon class="pi pi-search" />
-        <InputText v-model="searchTerm" placeholder="ស្វែងរកផលិតផល" />
-      </IconField>
+        <IconField>
+          <InputIcon class="pi pi-search" />
+          <InputText v-model="searchTerm" placeholder="ស្វែងរកផលិតផល" />
+        </IconField>
       </div>
-     
 
       <div>
         <Button
-        label="បន្ថែមផលិតផល"
-        icon="pi pi-plus"
-        severity="success"
-        @click="openAdd"
-      />
+          label="បន្ថែមផលិតផល"
+          icon="pi pi-plus"
+          severity="success"
+          @click="checkLoginAndOpenAdd"
+        />
       </div>
-      
     </div>
 
     <!-- ADD / EDIT DIALOG -->
@@ -62,12 +59,7 @@
     </Dialog>
 
     <!-- TABLE -->
-    <DataTable
-      :value="filteredProducts"
-      stripedRows
-      :loading="loading"
-     
-    >
+    <DataTable :value="filteredProducts" stripedRows :loading="loading">
       <Column header="ល.រ">
         <template #body="slotProps">
           {{ slotProps.index + 1 }}
@@ -77,44 +69,44 @@
       <Column field="product_name" header="ឈ្មោះ" />
       <Column field="price" header="តម្លៃ" />
 
-      <Column v-if="!isMobile" header="ថ្ងៃបង្កើត"  >
+      <Column v-if="!isMobile" header="ថ្ងៃបង្កើត">
         <template #body="slotProps">
           {{ new Date(slotProps.data.created_at).toLocaleDateString() }}
         </template>
       </Column>
 
-      
-      <Column    headerClass=" justify-content-end  "   >
+      <Column headerClass="justify-content-end">
         <template #body="slotProps">
-          <div class="flex gap-2 items-center align-items-center justify-content-end" >
+          <div class="flex gap-2 items-center align-items-center justify-content-end">
             <!-- Desktop: show full buttons -->
             <template v-if="!isMobile">
               <ProductView :product="slotProps.data" />
               <Button
-              icon="pi pi-pencil"
-              label="កែប្រែ"
-              class="p-button-primary"
-              @click="openEdit(slotProps.data)"
-            />
+                icon="pi pi-pencil"
+                label="កែប្រែ"
+                class="p-button-primary"
+                :disabled="userRole !== 'admin'"
+                @click="checkLoginAndEdit(slotProps.data)"
+              />
               <Button
-              icon="pi pi-trash"
-              label="លុប"
-              class="p-button-danger"
-              @click="deleteProduct(slotProps.data)"
-            />
+                icon="pi pi-trash"
+                label="លុប"
+                class="p-button-danger"
+                :disabled="userRole !== 'admin'"
+                @click="checkLoginAndDelete(slotProps.data)"
+              />
             </template>
 
             <!-- Mobile: show 3-dot menu -->
-            <template v-else >
+            <template v-else>
               <div class="flex align-items-center justify-content-center rounded-full w-full">
                 <Button
-                icon="pi pi-ellipsis-v"
-                text
-                rounded
-                @click="mobileMenu(slotProps.data, $event)"
-              />
+                  icon="pi pi-ellipsis-v"
+                  text
+                  rounded
+                  @click="mobileMenu(slotProps.data, $event)"
+                />
               </div>
-              
             </template>
           </div>
         </template>
@@ -128,6 +120,7 @@
 
 <script setup>
 import { ref, onMounted, computed } from 'vue'
+import { useRouter } from 'vue-router'
 import { supabase } from '@/supabase'
 
 import DataTable from 'primevue/datatable'
@@ -140,17 +133,16 @@ import IconField from 'primevue/iconfield'
 import InputIcon from 'primevue/inputicon'
 import ProductView from '@/Product/ProductView.vue'
 import ConfirmDialog from 'primevue/confirmdialog'
-// import { useConfirm } from 'primevue/useconfirm'
-
 import Menu from 'primevue/menu'
-import {useDevice} from '@/hook/useDevice.js'
+import { useDevice } from '@/hook/useDevice.js'
 
-const { isMobile, deviceName } = useDevice()
-/* STATE */
+const { isMobile } = useDevice()
+const router = useRouter()
+
+// STATE
 const visible = ref(false)
 const loading = ref(false)
 const saving = ref(false)
-// const confirm = useConfirm()
 const products = ref([])
 const categories = ref([])
 const menu = ref(null)
@@ -158,63 +150,114 @@ const menuItems = ref([])
 const productName = ref('')
 const productPrice = ref('')
 const selectedCategory = ref(null)
-
 const editingProduct = ref(null)
 const searchTerm = ref('')
 const selectedProduct = ref(null)
+const userRole = ref('') // track role
 
-const mobileMenu = (product, event) => {
-  selectedProduct.value = product
-  
-   
-  menuItems.value = [
-    // {
-    //   label: 'មើល',
-    //   icon: 'pi pi-eye',
-    //   command: () => openView(selectedCategory.value)
-    // },
-    {
-      label: 'កែប្រែ',
-      icon: 'pi pi-pencil',
-      command: () => openEdit(selectedProduct.value)
-    },
-    {
-      label: 'លុប',
-      icon: 'pi pi-trash',
-      command: () => deleteProduct(selectedProduct.value)
-    }
-  ]
-
-  menu.value.toggle(event) 
-}
-
-
-/* FETCH DATA */
+// ----------------------------------
+// Fetch Data
+// ----------------------------------
 const fetchProducts = async () => {
   loading.value = true
   const { data, error } = await supabase
     .from('Product')
     .select('*')
     .order('created_at', { ascending: false })
-
   if (!error) products.value = data
   loading.value = false
 }
 
 const fetchCategories = async () => {
-  const { data } = await supabase
-    .from('Category')
-    .select('id, category_name')
-
+  const { data } = await supabase.from('Category').select('id, category_name')
   categories.value = data || []
 }
 
+// ----------------------------------
+// Role / Auth
+// ----------------------------------
+const getCurrentUserRole = async () => {
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return null
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single()
+  return profile?.role || null
+}
+
+// async login check
+const checkLogin = async () => {
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    router.push('/login')
+    return false
+  }
+  // if role not loaded, load it
+  if (!userRole.value) {
+    userRole.value = await getCurrentUserRole()
+  }
+  return true
+}
+
+const checkLoginAndOpenAdd = async () => {
+  const loggedIn = await checkLogin()
+  if (!loggedIn) return
+  if (userRole.value !== 'admin') {
+    alert('អ្នកគ្មានសិទ្ធិបន្ថែម')
+    return
+  }
+  openAdd()
+}
+
+const checkLoginAndEdit = async (product) => {
+  const loggedIn = await checkLogin()
+  if (!loggedIn) return
+  if (userRole.value !== 'admin') {
+    alert('អ្នកគ្មានសិទ្ធិកែប្រែ')
+    return
+  }
+  openEdit(product)
+}
+
+const checkLoginAndDelete = async (product) => {
+  const loggedIn = await checkLogin()
+  if (!loggedIn) return
+  if (userRole.value !== 'admin') {
+    alert('អ្នកគ្មានសិទ្ធិលុប')
+    return
+  }
+  deleteProduct(product)
+}
+
+// ----------------------------------
+// Mobile Menu
+// ----------------------------------
+const mobileMenu = (product, event) => {
+  selectedProduct.value = product
+  menuItems.value = [
+    { label: 'View', icon: 'pi pi-eye', command: () => openView(selectedProduct.value) },
+    { label: 'Edit', icon: 'pi pi-pencil', disabled: userRole.value !== 'admin', command: () => checkLoginAndEdit(selectedProduct.value) },
+    { label: 'Delete', icon: 'pi pi-trash', disabled: userRole.value !== 'admin', command: () => checkLoginAndDelete(selectedProduct.value) }
+  ]
+  menu.value.toggle(event)
+}
+
+const openView = (product) => {
+  ProductView.open(product)
+}
+
+// ----------------------------------
+// CRUD
+// ----------------------------------
 onMounted(async () => {
   await fetchProducts()
   await fetchCategories()
+  // preload user role
+  userRole.value = await getCurrentUserRole()
 })
 
-/* SEARCH */
 const filteredProducts = computed(() => {
   if (!searchTerm.value) return products.value
   return products.value.filter(p =>
@@ -222,7 +265,6 @@ const filteredProducts = computed(() => {
   )
 })
 
-/* OPEN ADD */
 const openAdd = () => {
   editingProduct.value = null
   productName.value = ''
@@ -231,7 +273,6 @@ const openAdd = () => {
   visible.value = true
 }
 
-/* OPEN EDIT */
 const openEdit = (product) => {
   editingProduct.value = product
   productName.value = product.product_name
@@ -240,13 +281,11 @@ const openEdit = (product) => {
   visible.value = true
 }
 
-/* CLOSE */
 const closeDialog = () => {
   visible.value = false
   editingProduct.value = null
 }
 
-/* SAVE (ADD / UPDATE) */
 const saveProduct = async () => {
   if (!productName.value || !productPrice.value || !selectedCategory.value) {
     alert('សូមបំពេញព័ត៌មានទាំងអស់')
@@ -254,7 +293,6 @@ const saveProduct = async () => {
   }
 
   saving.value = true
-
   const payload = {
     product_name: productName.value,
     price: productPrice.value,
@@ -262,18 +300,10 @@ const saveProduct = async () => {
   }
 
   let result
-
   if (editingProduct.value) {
-    // UPDATE
-    result = await supabase
-      .from('Product')
-      .update(payload)
-      .eq('id', editingProduct.value.id)
+    result = await supabase.from('Product').update(payload).eq('id', editingProduct.value.id)
   } else {
-    // INSERT
-    result = await supabase
-      .from('Product')
-      .insert(payload)
+    result = await supabase.from('Product').insert(payload)
   }
 
   if (!result.error) {
@@ -287,18 +317,10 @@ const saveProduct = async () => {
   saving.value = false
 }
 
-/* DELETE */
 const deleteProduct = async (product) => {
   if (!confirm('តើអ្នកចង់លុបផលិតផលនេះមែនទេ?')) return
-
-  const { error } = await supabase
-    .from('Product')
-    .delete()
-    .eq('id', product.id)
-
-  if (!error) {
-    products.value = products.value.filter(p => p.id !== product.id)
-  }
+  const { error } = await supabase.from('Product').delete().eq('id', product.id)
+  if (!error) products.value = products.value.filter(p => p.id !== product.id)
 }
 </script>
 

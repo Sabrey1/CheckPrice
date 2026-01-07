@@ -1,4 +1,4 @@
-<template>
+<!-- <template>
   <div class="login-container">
     <Card class="login-card">
       <template #title>
@@ -102,5 +102,11 @@ const login = async () => {
 }
 .login-card {
   width: 350px;
+}
+
+.field label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
 }
 </style>
