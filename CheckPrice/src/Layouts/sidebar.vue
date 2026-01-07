@@ -41,7 +41,7 @@
         </RouterLink> -->
         <RouterLink
           to="/login"
-           @click.native="handleLogout"
+            @click="logout"
           class="flex align-items-center p-3 border-round hover:surface-700 text-white no-underline"
         >
           <i class="pi pi-sign-out mr-3"></i>
@@ -91,17 +91,13 @@ const toggle = () => {
   visible.value = !visible.value
 }
 
-const handleLogout = (event) => {
-  // Prevent default RouterLink navigation so we can handle it manually
-  event.preventDefault();
+const logout = () => {
+  // 1️⃣ Clear all localStorage
+  localStorage.clear()
 
-  // Clear saved credentials
-  localStorage.removeItem('user_info');
-  localStorage.removeItem('auth_token');
-  
-  // Navigate to login
-  router.push('/login');
-};
+   
+   
+}
 </script>
 
 <style scoped>
