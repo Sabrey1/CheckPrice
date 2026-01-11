@@ -12,10 +12,10 @@
       <div>
         <Button
           label="បញ្ចូលទំនិញ"
-          icon="pi pi-plus"
+          
           severity="success"
           @click="checkLoginAndOpenAdd"
-          class="p-1 py-2 wrap-content"
+          class="p-1 py-2 w-full"
         />
       </div>
     </div>
