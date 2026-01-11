@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- SEARCH + ADD -->
-    <div class="flex align-items-center gap-2 justify-content-between mb-3 p-3">
+    <div class="flex align-items-center gap-1 justify-content-between mb-3 btn">
       <div>
         <IconField>
           <InputIcon class="pi pi-search" />
@@ -15,6 +15,7 @@
           icon="pi pi-plus"
           severity="success"
           @click="checkLoginAndOpenAdd"
+          class="p-1 py-2"
         />
       </div>
     </div>
@@ -329,5 +330,9 @@ const deleteProduct = async (product) => {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.btn{
+  padding: 12px;
 }
 </style>
