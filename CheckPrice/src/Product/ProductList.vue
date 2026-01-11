@@ -2,10 +2,10 @@
   <div>
     <!-- SEARCH + ADD -->
     <div class="flex align-items-center gap-1 justify-content-between mb-3 btn">
-      <div>
-        <IconField>
+      <div class="w-8">
+        <IconField >
           <InputIcon class="pi pi-search" />
-          <InputText v-model="searchTerm" placeholder="ស្វែងរកផលិតផល" />
+          <InputText v-model="searchTerm" class="w-full" placeholder="ស្វែងរកផលិតផល" />
         </IconField>
       </div>
 
