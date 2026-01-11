@@ -11,11 +11,11 @@
 
       <div>
         <Button
-          label="បន្ថែមផលិតផល"
+          label="បញ្ចូលទំនិញ"
           icon="pi pi-plus"
           severity="success"
           @click="checkLoginAndOpenAdd"
-          class="p-1 py-2"
+          class="p-1 py-2 wrap-content"
         />
       </div>
     </div>
