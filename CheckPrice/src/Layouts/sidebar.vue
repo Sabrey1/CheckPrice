@@ -60,7 +60,9 @@
           <Button icon="pi pi-bars" class="p-button-text" @click="toggle" />
           <span class="ml-2 font-bold text-2xl">{{ pageTitle }}</span>
         </div>
-         
+         <div>
+          <Button   v-if="!isLoggedIn" label="Login" class="p-button-text" @click="login" />  
+         </div>
       </div>
 
       <div class=" pt-16 overflow-auto h-[calc(100vh-64px)]">
@@ -72,33 +74,52 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import { useRoute } from 'vue-router'
-
+import { ref, computed, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import Button from 'primevue/button'
- 
+
+const AUTH_KEY = 'sb-mzgtiuvtgzhmmkylduja-auth-token'
 
 const route = useRoute()
- 
+const router = useRouter()
 
 const visible = ref(false)
+const isLoggedIn = ref(false)
 
+/* ✅ Check login status from localStorage */
+const checkLogin = () => {
+  isLoggedIn.value = !!localStorage.getItem(AUTH_KEY)
+}
+
+/* Run on page load */
+onMounted(() => {
+  checkLogin()
+})
+
+/* Sidebar logic */
 const showSidebar = computed(() => !route.meta.hideSidebar)
-
-const pageTitle = computed(() => route.meta.title ? route.meta.title : '')
+const pageTitle = computed(() => route.meta.title || '')
 
 const toggle = () => {
   visible.value = !visible.value
 }
 
-const logout = () => {
-  // 1️⃣ Clear all localStorage
-  localStorage.clear()
-
-   
-   
+/* ✅ Login */
+const login = () => {
+  router.push('/login')
 }
+
+/* ✅ Logout */
+const logout = () => {
+  localStorage.removeItem(AUTH_KEY)
+  isLoggedIn.value = false
+  router.push('/login')
+}
+
+/* ✅ Optional: sync across tabs */
+window.addEventListener('storage', checkLogin)
 </script>
+
 
 <style scoped>
 .sidebar {

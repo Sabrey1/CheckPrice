@@ -69,13 +69,13 @@
                 :disabled="userRole !== 'admin'"
                 @click="checkLoginAndEdit(slotProps.data)"
               />
-              <Button
+              <!-- <Button
                 icon="pi pi-trash"
                 label="លុប"
                 class="p-button-danger"
                 :disabled="userRole !== 'admin'"
                 @click="checkLoginAndDelete(slotProps.data)"
-              />
+              /> -->
             </template>
 
             <!-- Mobile menu -->
@@ -314,12 +314,12 @@ const mobileMenu = (category, event) => {
       disabled: userRole.value !== 'admin',
       command: () => checkLoginAndEdit(selectedCategory.value)
     },
-    {
-      label: 'Delete',
-      icon: 'pi pi-trash',
-      disabled: userRole.value !== 'admin',
-      command: () => checkLoginAndDelete(selectedCategory.value)
-    }
+    // {
+    //   label: 'Delete',
+    //   icon: 'pi pi-trash',
+    //   disabled: userRole.value !== 'admin',
+    //   command: () => checkLoginAndDelete(selectedCategory.value)
+    // }
   ]
   menu.value.toggle(event)
 }

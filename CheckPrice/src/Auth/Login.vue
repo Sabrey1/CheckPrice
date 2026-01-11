@@ -90,14 +90,16 @@ const signIn = async () => {
     .eq('id', user.id)
     .single()
 
-  
   if (profileError || !profile) {
     errorMsg.value = 'Profile not found. Contact admin.'
     return
   }
-    router.push('/')
-   
+    router.push('/').then(() => {
+  window.location.reload()
+})
 }
+
+
 </script>
 
 
