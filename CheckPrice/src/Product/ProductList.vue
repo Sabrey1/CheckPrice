@@ -81,7 +81,12 @@
           <div class="flex gap-2 items-center align-items-center justify-content-end">
             <!-- Desktop: show full buttons -->
             <template v-if="!isMobile">
-              <ProductView :product="slotProps.data" />
+              <Button
+                  icon="pi pi-eye"
+                  label="បង្ហាញ"
+                  class="p-button-success"
+                  @click="openView(slotProps.data)"
+                />
               <Button
                 icon="pi pi-pencil"
                 label="កែប្រែ"
@@ -113,7 +118,10 @@
         </template>
       </Column>
     </DataTable>
-
+<ProductView
+  :product="selectedProduct"
+  v-model:visible="showViewDialog"
+/>
     <ConfirmDialog />
     <Menu ref="menu" :model="menuItems" :popup="true" />
   </div>
@@ -124,14 +132,6 @@ import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { supabase } from '@/supabase'
 
-import DataTable from 'primevue/datatable'
-import Column from 'primevue/column'
-import Dialog from 'primevue/dialog'
-import InputText from 'primevue/inputtext'
-import Button from 'primevue/button'
-import Select from 'primevue/select'
-import IconField from 'primevue/iconfield'
-import InputIcon from 'primevue/inputicon'
 import ProductView from '@/Product/ProductView.vue'
 import ConfirmDialog from 'primevue/confirmdialog'
 import Menu from 'primevue/menu'
@@ -155,6 +155,10 @@ const editingProduct = ref(null)
 const searchTerm = ref('')
 const selectedProduct = ref(null)
 const userRole = ref('') // track role
+
+const showViewDialog = ref(false)
+ 
+
 
 // ----------------------------------
 // Fetch Data
@@ -246,7 +250,8 @@ const mobileMenu = (product, event) => {
 }
 
 const openView = (product) => {
-  ProductView.open(product)
+  selectedProduct.value = product
+  showViewDialog.value = true
 }
 
 // ----------------------------------
@@ -255,7 +260,7 @@ const openView = (product) => {
 onMounted(async () => {
   await fetchProducts()
   await fetchCategories()
-  // preload user role
+   
   userRole.value = await getCurrentUserRole()
 })
 

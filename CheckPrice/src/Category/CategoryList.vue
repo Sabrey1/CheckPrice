@@ -48,7 +48,11 @@
       </Column>
 
       <Column field="category_name" class="p-0" header="ឈ្មោះប្រភេទ" />
-      <Column field="description" v-if="!isMobile" header="ពិពណ៌នា" />
+      <Column v-if="!isMobile" header="ពិពណ៌នា" >
+        <template #body="slotProps">
+          <p v-if="slotProps.data.description !== null">{{ slotProps.data.description }}</p>
+        </template>
+      </Column>
 
       <Column v-if="!isMobile" header="ថ្ងៃបង្កើត">
         <template #body="slotProps">
@@ -61,7 +65,12 @@
           <div class="flex gap-2 items-center justify-content-end">
             <!-- Desktop Buttons -->
             <template v-if="!isMobile">
-              <CategoryView :category="slotProps.data" />
+              <Button
+  icon="pi pi-eye"
+  label="បង្ហាញ"
+  severity="success"
+  @click="openView(slotProps.data)"
+/>
               <Button
                 icon="pi pi-pencil"
                 label="កែប្រែ"
@@ -91,7 +100,10 @@
         </template>
       </Column>
     </DataTable>
-
+<CategoryView
+  :category="selectedCategory"
+  v-model:visible="showViewDialog"
+/>
     <ConfirmDialog />
     <Menu ref="menu" :model="menuItems" :popup="true" />
   </div>
@@ -103,16 +115,9 @@ import { useRouter } from 'vue-router'
 import { supabase } from '@/supabase'
 import { useToast } from 'primevue/usetoast'
 import { useDevice } from '@/hook/useDevice.js'
-
-import DataTable from 'primevue/datatable'
-import Column from 'primevue/column'
-import Dialog from 'primevue/dialog'
-import InputText from 'primevue/inputtext'
-import Button from 'primevue/button'
 import CategoryView from '@/Category/CategoryView.vue'
 import ConfirmDialog from 'primevue/confirmdialog'
 import { useConfirm } from 'primevue/useconfirm'
-import Menu from 'primevue/menu'
 
 const { isMobile } = useDevice()
 const toast = useToast()
@@ -128,6 +133,12 @@ const saving = ref(false)
 const categoryName = ref('')
 const description = ref('')
 const editingCategory = ref(null)
+
+const viewVisible = ref(false)
+const viewCategory = ref(null)
+
+ 
+const showViewDialog = ref(false);
 
 // Mobile menu
 const menu = ref(null)
@@ -307,9 +318,13 @@ const deleteCategory = async (category) => {
 const mobileMenu = (category, event) => {
   selectedCategory.value = category
   menuItems.value = [
-    { label: 'View', icon: 'pi pi-eye', command: () => openView(selectedCategory.value) },
     {
-      label: 'Edit',
+  label: "បង្ហាញ",
+  icon: "pi pi-eye",
+  command: () => openView(selectedCategory.value)
+},
+    {
+      label: 'កែប្រែ',
       icon: 'pi pi-pencil',
       disabled: userRole.value !== 'admin',
       command: () => checkLoginAndEdit(selectedCategory.value)
@@ -323,10 +338,9 @@ const mobileMenu = (category, event) => {
   ]
   menu.value.toggle(event)
 }
-
-const openView = (category) => {
-  if (!checkLogin()) return
-  CategoryView.open(category)
+function openView(category) {
+  selectedCategory.value = category;
+  showViewDialog.value = true;
 }
 </script>
 
