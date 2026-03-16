@@ -16,20 +16,20 @@
       v-model:visible="visible"
       modal
       :header="editingCategory ? 'កែប្រែប្រភេទ' : 'បន្ថែមប្រភេទ'"
-      :style="{ width: '30rem' }"
+      :style="{ width: '30rem', margin: '1rem' }"
     >
-      <div class="flex items-center gap-4 mb-4">
+      <div class="mb-4">
         <label class="font-semibold w-24">ឈ្មោះ</label>
-        <InputText v-model="categoryName" class="flex-auto" />
+        <InputText v-model="categoryName" class="flex-auto w-full mt-1" />
       </div>
 
-      <div class="flex items-center gap-4 mb-8">
+      <div class="mb-4">
         <label class="font-semibold w-24">ពិពណ៌នា</label>
-        <InputText v-model="description" class="flex-auto" />
+        <InputText v-model="description" class="flex-auto w-full mt-1" />
       </div>
 
       <div class="flex justify-end gap-2">
-        <Button type="button" label="Cancel" severity="secondary" @click="closeDialog" />
+        <Button type="button" label="បោះបង់" severity="secondary" @click="closeDialog" />
         <Button
           type="button"
           :label="editingCategory ? 'កែប្រែ' : 'រក្សាទុក'"

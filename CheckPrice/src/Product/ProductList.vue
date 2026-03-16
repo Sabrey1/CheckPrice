@@ -12,7 +12,6 @@
       <div>
         <Button
           label="បញ្ចូលទំនិញ"
-          
           severity="success"
           @click="checkLoginAndOpenAdd"
           class="p-1 py-2 w-full"
@@ -25,14 +24,15 @@
       v-model:visible="visible"
       modal
       :header="editingProduct ? 'កែប្រែផលិតផល' : 'បន្ថែមផលិតផល'"
-      :style="{ width: '30rem' }"
+      :style="{ width: '30rem',margin: '1rem' }"
     >
-      <div class="flex items-center gap-4 mb-2">
-        <label class="font-semibold w-24">ឈ្មោះ</label>
-        <InputText v-model="productName" class="flex-auto" />
+      <div class="mb-2">
+        <label class="font-semibold w-24 mb-2 pb-2">ឈ្មោះ</label>
+        <br/>
+        <InputText v-model="productName" class="flex-auto w-full mt-1" />
       </div>
 
-      <div class="flex items-center gap-2 mb-2">
+      <div class="mb-2">
         <label class="font-semibold w-24">ប្រភេទ</label>
         <Select
           v-model="selectedCategory"
@@ -40,13 +40,13 @@
           optionLabel="category_name"
           optionValue="id"
           placeholder="ជ្រើសរើសប្រភេទ"
-          class="flex-auto"
+          class="flex-auto w-full mt-1"
         />
       </div>
 
-      <div class="flex items-center gap-4 mb-4">
+      <div class="mb-4">
         <label class="font-semibold w-24">តម្លៃ</label>
-        <InputText v-model="productPrice" class="flex-auto" />
+        <InputText v-model="productPrice" class="flex-auto w-full mt-1" />
       </div>
 
       <div class="flex justify-end gap-2">
