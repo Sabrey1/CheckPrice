@@ -17,6 +17,8 @@ import Select from 'primevue/select'
 import IconField from 'primevue/iconfield'
 import InputIcon from 'primevue/inputicon'
 import ConfirmDialog from 'primevue/confirmdialog'
+import FileUpload from 'primevue/fileupload';
+
 
 
 const app = createApp(App)
@@ -34,6 +36,7 @@ app.component('Select', Select);
 app.component('IconField', IconField);
 app.component('InputIcon', InputIcon);
 app.component('ConfirmDialog', ConfirmDialog);
+app.component('FileUpload', FileUpload);
 app.use(PrimeVue, {
     theme: {
         preset: Aura

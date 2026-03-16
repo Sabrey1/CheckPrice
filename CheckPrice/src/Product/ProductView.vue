@@ -5,9 +5,26 @@
     header="ព័ត៌មានផលិតផល"
     :style="{ width: '30rem', margin: '1rem' }"
   >
+    <!-- Avatar -->
+    <div class="flex justify-content-center mb-4">
+      <Avatar
+        v-if="product?.image"
+        :image="product.image"
+        size="xlarge"
+        shape="circle"
+        style="width: 80px; height: 80px;"
+      />
+      <Avatar
+        v-else
+        :label="firstLetter"
+        size="xlarge"
+        shape="circle"
+        style="width: 80px; height: 80px; font-size: 2rem; background-color: #6366f1; color: #fff;"
+      />
+    </div>
+
     <table class="category-table">
       <tbody>
-    
         <tr>
           <th>ឈ្មោះ</th>
           <td>{{ product?.product_name }}</td>
@@ -30,22 +47,28 @@
 </template>
 
 <script setup>
-import { computed } from "vue"
+import { computed } from 'vue'
+import Avatar from 'primevue/avatar'
 
 const props = defineProps({
   product: Object,
   visible: Boolean
 })
 
-const emit = defineEmits(["update:visible"])
+const emit = defineEmits(['update:visible'])
 
 const visible = computed({
   get: () => props.visible,
-  set: (v) => emit("update:visible", v)
+  set: (v) => emit('update:visible', v)
+})
+
+// Get first letter of product name, fallback to '?'
+const firstLetter = computed(() => {
+  return props.product?.product_name?.charAt(0).toUpperCase() || '?'
 })
 
 const formatDate = (date) => {
-  return date ? new Date(date).toLocaleDateString() : "-"
+  return date ? new Date(date).toLocaleDateString() : '-'
 }
 </script>
 
