@@ -180,9 +180,6 @@ onMounted(async () => {
   localStorage.setItem('userRole', userRole.value)
 })
 
-// ----------------------------------
-// LOGIN CHECK
-// ----------------------------------
 const checkLogin = () => {
   const role = userRole.value || localStorage.getItem('userRole')
   if (!role) {
@@ -219,9 +216,6 @@ const checkLoginAndDelete = (category) => {
   confirmDelete(category)
 }
 
-// ----------------------------------
-// DIALOG CRUD
-// ----------------------------------
 const openAdd = () => {
   editingCategory.value = null
   categoryName.value = ''
@@ -312,9 +306,6 @@ const deleteCategory = async (category) => {
   }
 }
 
-// ----------------------------------
-// Mobile Menu
-// ----------------------------------
 const mobileMenu = (category, event) => {
   selectedCategory.value = category
   menuItems.value = [

@@ -49,6 +49,11 @@
         <InputText v-model="productPrice" class="flex-auto w-full mt-1" />
       </div>
 
+      <div class="mb-4">
+        <label class="font-semibold w-24">ពិពណ៌នា</label>
+        <InputText v-model="description" class="flex-auto w-full mt-1" />
+      </div>
+
       <div class="flex justify-end gap-2">
         <Button label="បោះបង់" severity="secondary" @click="closeDialog" />
         <Button
@@ -150,19 +155,14 @@ const menu = ref(null)
 const menuItems = ref([])
 const productName = ref('')
 const productPrice = ref('')
+const description = ref('')
 const selectedCategory = ref(null)
 const editingProduct = ref(null)
 const searchTerm = ref('')
 const selectedProduct = ref(null)
-const userRole = ref('') // track role
-
+const userRole = ref('')
 const showViewDialog = ref(false)
  
-
-
-// ----------------------------------
-// Fetch Data
-// ----------------------------------
 const fetchProducts = async () => {
   loading.value = true
   const { data, error } = await supabase
@@ -178,9 +178,6 @@ const fetchCategories = async () => {
   categories.value = data || []
 }
 
-// ----------------------------------
-// Role / Auth
-// ----------------------------------
 const getCurrentUserRole = async () => {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return null
@@ -236,9 +233,6 @@ const checkLoginAndDelete = async (product) => {
   deleteProduct(product)
 }
 
-// ----------------------------------
-// Mobile Menu
-// ----------------------------------
 const mobileMenu = (product, event) => {
   selectedProduct.value = product
   menuItems.value = [
@@ -254,9 +248,6 @@ const openView = (product) => {
   showViewDialog.value = true
 }
 
-// ----------------------------------
-// CRUD
-// ----------------------------------
 onMounted(async () => {
   await fetchProducts()
   await fetchCategories()
@@ -276,6 +267,7 @@ const openAdd = () => {
   productName.value = ''
   productPrice.value = ''
   selectedCategory.value = null
+  description.value = ''
   visible.value = true
 }
 
@@ -284,6 +276,7 @@ const openEdit = (product) => {
   productName.value = product.product_name
   productPrice.value = product.price
   selectedCategory.value = product.category_id
+  description.value = product.description
   visible.value = true
 }
 
@@ -302,7 +295,8 @@ const saveProduct = async () => {
   const payload = {
     product_name: productName.value,
     price: productPrice.value,
-    category_id: selectedCategory.value
+    category_id: selectedCategory.value,
+    description: description.value
   }
 
   let result

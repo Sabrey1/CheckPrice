@@ -7,10 +7,7 @@
   >
     <table class="category-table">
       <tbody>
-        <!-- <tr>
-          <th>រូបភាព</th>
-          <td>{{ product?.image || '-' }}</td>
-        </tr> -->
+    
         <tr>
           <th>ឈ្មោះ</th>
           <td>{{ product?.product_name }}</td>
@@ -18,6 +15,10 @@
         <tr>
           <th>តម្លៃ</th>
           <td>{{ product?.price || '-' }}</td>
+        </tr>
+        <tr v-if="product?.description">
+          <th>ពិពណ៌នា</th>
+          <td>{{ product?.description || '-' }}</td>
         </tr>
         <tr>
           <th>ថ្ងៃបង្កើត</th>
