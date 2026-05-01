@@ -18,18 +18,18 @@
       :header="editingCategory ? 'កែប្រែប្រភេទ' : 'បន្ថែមប្រភេទ'"
       :style="{ width: '30rem' }"
     >
-      <div class="flex items-center gap-4 mb-4">
-        <label class="font-semibold w-24">ឈ្មោះ</label>
-        <InputText v-model="categoryName" class="flex-auto" />
+      <div class="mb-4">
+        <label class="font-semibold ">ឈ្មោះ</label>
+        <InputText v-model="categoryName" class="w-full mt-2" />
       </div>
 
-      <div class="flex items-center gap-4 mb-8">
+      <div class="mb-5">
         <label class="font-semibold w-24">ពិពណ៌នា</label>
-        <InputText v-model="description" class="flex-auto" />
+        <InputText v-model="description" class="w-full mt-2" />
       </div>
 
       <div class="flex justify-end gap-2">
-        <Button type="button" label="Cancel" severity="secondary" @click="closeDialog" />
+        <Button type="button" label="បោះបង់" severity="danger" @click="closeDialog" />
         <Button
           type="button"
           :label="editingCategory ? 'កែប្រែ' : 'រក្សាទុក'"
@@ -69,13 +69,7 @@
                 :disabled="userRole !== 'admin'"
                 @click="checkLoginAndEdit(slotProps.data)"
               />
-              <!-- <Button
-                icon="pi pi-trash"
-                label="លុប"
-                class="p-button-danger"
-                :disabled="userRole !== 'admin'"
-                @click="checkLoginAndDelete(slotProps.data)"
-              /> -->
+             
             </template>
 
             <!-- Mobile menu -->
@@ -104,11 +98,6 @@ import { supabase } from '@/supabase'
 import { useToast } from 'primevue/usetoast'
 import { useDevice } from '@/hook/useDevice.js'
 
-import DataTable from 'primevue/datatable'
-import Column from 'primevue/column'
-import Dialog from 'primevue/dialog'
-import InputText from 'primevue/inputtext'
-import Button from 'primevue/button'
 import CategoryView from '@/Category/CategoryView.vue'
 import ConfirmDialog from 'primevue/confirmdialog'
 import { useConfirm } from 'primevue/useconfirm'
@@ -137,9 +126,6 @@ const selectedCategory = ref(null)
 // Track logged-in user role
 const userRole = ref('')
 
-// ----------------------------------
-// Load categories & user role
-// ----------------------------------
 onMounted(async () => {
   // Load categories
   loading.value = true
@@ -169,9 +155,6 @@ onMounted(async () => {
   localStorage.setItem('userRole', userRole.value)
 })
 
-// ----------------------------------
-// LOGIN CHECK
-// ----------------------------------
 const checkLogin = () => {
   const role = userRole.value || localStorage.getItem('userRole')
   if (!role) {
@@ -208,9 +191,6 @@ const checkLoginAndDelete = (category) => {
   confirmDelete(category)
 }
 
-// ----------------------------------
-// DIALOG CRUD
-// ----------------------------------
 const openAdd = () => {
   editingCategory.value = null
   categoryName.value = ''
@@ -301,9 +281,6 @@ const deleteCategory = async (category) => {
   }
 }
 
-// ----------------------------------
-// Mobile Menu
-// ----------------------------------
 const mobileMenu = (category, event) => {
   selectedCategory.value = category
   menuItems.value = [
@@ -314,12 +291,6 @@ const mobileMenu = (category, event) => {
       disabled: userRole.value !== 'admin',
       command: () => checkLoginAndEdit(selectedCategory.value)
     },
-    // {
-    //   label: 'Delete',
-    //   icon: 'pi pi-trash',
-    //   disabled: userRole.value !== 'admin',
-    //   command: () => checkLoginAndDelete(selectedCategory.value)
-    // }
   ]
   menu.value.toggle(event)
 }

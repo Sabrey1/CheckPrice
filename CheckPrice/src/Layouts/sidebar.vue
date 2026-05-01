@@ -6,7 +6,7 @@
       :style="{ width: visible ? '16rem' : '0', backgroundColor: '#1f2937' }"
     >
       <div class="p-3 text-xl font-bold border-bottom-1 border-700" style="color: #ffffff;">
-        My App
+        Check Price
       </div>
 
       <ul class="list-none p-2 m-0 flex-grow-1 overflow-auto">
@@ -32,13 +32,6 @@
       </ul>
 
       <div class="p-2 border-top-1 border-700">
-        <!-- <RouterLink
-          to="/settings"
-          class="flex align-items-center p-3 border-round hover:surface-700 text-white no-underline"
-        >
-          <i class="pi pi-cog mr-3"></i>
-          <span>Settings</span>
-        </RouterLink> -->
         <RouterLink
           to="/login"
             @click="logout"

@@ -6,11 +6,6 @@ import Products from '@/Product/ProductList.vue'
 import Login from '@/Auth/Login.vue'
 // Define routes
 const routes = [
-//   {
-//     path: '/',
-//     name: 'Home',
-//     component: Home
-//   },
 {
     path: '/',
     name: 'Products',
@@ -21,7 +16,6 @@ const routes = [
     path: '/login',
     name: 'Login',
     component: Login 
-   
   },
   {
     path: '/category',
@@ -29,8 +23,6 @@ const routes = [
     component: CategoryList,
     meta: { title: 'ឈ្មោះប្រភេទ' }
   },
-  
-  // Catch all unmatched routes
 //   {
 //     path: '/:pathMatch(.*)*',
 //     name: 'NotFound',

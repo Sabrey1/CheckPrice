@@ -12,7 +12,6 @@
       <div>
         <Button
           label="បញ្ចូលទំនិញ"
-          
           severity="success"
           @click="checkLoginAndOpenAdd"
           class="p-1 py-2 w-full"
@@ -27,12 +26,12 @@
       :header="editingProduct ? 'កែប្រែផលិតផល' : 'បន្ថែមផលិតផល'"
       :style="{ width: '30rem' }"
     >
-      <div class="flex items-center gap-4 mb-2">
+      <div class=" mb-2">
         <label class="font-semibold w-24">ឈ្មោះ</label>
-        <InputText v-model="productName" class="flex-auto" />
+        <InputText v-model="productName" class="w-full mt-2" />
       </div>
 
-      <div class="flex items-center gap-2 mb-2">
+      <div class="mb-2">
         <label class="font-semibold w-24">ប្រភេទ</label>
         <Select
           v-model="selectedCategory"
@@ -40,13 +39,13 @@
           optionLabel="category_name"
           optionValue="id"
           placeholder="ជ្រើសរើសប្រភេទ"
-          class="flex-auto"
+          class="w-full mt-2"
         />
       </div>
 
-      <div class="flex items-center gap-4 mb-4">
+      <div class="mb-4">
         <label class="font-semibold w-24">តម្លៃ</label>
-        <InputText v-model="productPrice" class="flex-auto" />
+        <InputText v-model="productPrice" class="w-full mt-2" />
       </div>
 
       <div class="flex justify-end gap-2">
@@ -123,15 +122,6 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { supabase } from '@/supabase'
-
-import DataTable from 'primevue/datatable'
-import Column from 'primevue/column'
-import Dialog from 'primevue/dialog'
-import InputText from 'primevue/inputtext'
-import Button from 'primevue/button'
-import Select from 'primevue/select'
-import IconField from 'primevue/iconfield'
-import InputIcon from 'primevue/inputicon'
 import ProductView from '@/Product/ProductView.vue'
 import ConfirmDialog from 'primevue/confirmdialog'
 import Menu from 'primevue/menu'
@@ -156,9 +146,6 @@ const searchTerm = ref('')
 const selectedProduct = ref(null)
 const userRole = ref('') // track role
 
-// ----------------------------------
-// Fetch Data
-// ----------------------------------
 const fetchProducts = async () => {
   loading.value = true
   const { data, error } = await supabase
@@ -174,9 +161,6 @@ const fetchCategories = async () => {
   categories.value = data || []
 }
 
-// ----------------------------------
-// Role / Auth
-// ----------------------------------
 const getCurrentUserRole = async () => {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return null
@@ -232,9 +216,6 @@ const checkLoginAndDelete = async (product) => {
   deleteProduct(product)
 }
 
-// ----------------------------------
-// Mobile Menu
-// ----------------------------------
 const mobileMenu = (product, event) => {
   selectedProduct.value = product
   menuItems.value = [
@@ -249,9 +230,6 @@ const openView = (product) => {
   ProductView.open(product)
 }
 
-// ----------------------------------
-// CRUD
-// ----------------------------------
 onMounted(async () => {
   await fetchProducts()
   await fetchCategories()
