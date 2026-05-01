@@ -289,7 +289,6 @@ const deleteCategory = async (category) => {
 const mobileMenu = (category, event) => {
   selectedCategory.value = category
   menuItems.value = [
-    { label: 'View', icon: 'pi pi-eye', command: () => openView(selectedCategory.value) },
     {
       label: 'Edit',
       icon: 'pi pi-pencil',

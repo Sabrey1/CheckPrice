@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- SEARCH + ADD -->
-    <div class="flex align-items-center gap-1 justify-content-between mb-3 btn">
+    <div class="flex align-items-center gap-1 justify-content-between mb-1 btn">
       <div class="w-8">
         <IconField >
           <InputIcon class="pi pi-search" />
@@ -17,6 +17,19 @@
           class="p-1 py-2 w-full"
         />
       </div>
+    </div>
+
+    <!-- FILTER -->
+    <div class="flex gap-2 mb-3 mx-3">
+      <Select
+        v-model="filterCategory"
+        :options="categories"
+        optionLabel="category_name"
+        optionValue="id"
+        placeholder="Filter by category"
+        class="w-full"
+      />
+      <Button label="Clear" @click="clearFilter" />
     </div>
 
     <!-- ADD / EDIT DIALOG -->
@@ -60,6 +73,11 @@
 
     <!-- TABLE -->
     <DataTable :value="filteredProducts" stripedRows :loading="loading">
+        <template #empty>
+    <div class="text-center p-3">
+      មិនមានទិន្នន័យ
+    </div>
+  </template>
       <Column header="ល.រ">
         <template #body="slotProps">
           {{ slotProps.index + 1 }}
@@ -123,14 +141,6 @@ import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { supabase } from '@/supabase'
 
-import DataTable from 'primevue/datatable'
-import Column from 'primevue/column'
-import Dialog from 'primevue/dialog'
-import InputText from 'primevue/inputtext'
-import Button from 'primevue/button'
-import Select from 'primevue/select'
-import IconField from 'primevue/iconfield'
-import InputIcon from 'primevue/inputicon'
 import ProductView from '@/Product/ProductView.vue'
 import ConfirmDialog from 'primevue/confirmdialog'
 import Menu from 'primevue/menu'
@@ -154,7 +164,10 @@ const editingProduct = ref(null)
 const searchTerm = ref('')
 const selectedProduct = ref(null)
 const userRole = ref('') // track role
-
+const filterCategory = ref(null)
+const viewDialog = ref(false)
+// const selectedProduct = ref(null)
+  
 const fetchProducts = async () => {
   loading.value = true
   const { data, error } = await supabase
@@ -228,15 +241,15 @@ const checkLoginAndDelete = async (product) => {
 const mobileMenu = (product, event) => {
   selectedProduct.value = product
   menuItems.value = [
-    { label: 'View', icon: 'pi pi-eye', command: () => openView(selectedProduct.value) },
     { label: 'Edit', icon: 'pi pi-pencil', disabled: userRole.value !== 'admin', command: () => checkLoginAndEdit(selectedProduct.value) },
     { label: 'Delete', icon: 'pi pi-trash', disabled: userRole.value !== 'admin', command: () => checkLoginAndDelete(selectedProduct.value) }
   ]
   menu.value.toggle(event)
 }
 
-const openView = (product) => {
-  ProductView.open(product)
+function openView(product) {
+  selectedProduct.value = product
+  viewDialog.value = true
 }
 
 onMounted(async () => {
@@ -247,11 +260,21 @@ onMounted(async () => {
 })
 
 const filteredProducts = computed(() => {
-  if (!searchTerm.value) return products.value
-  return products.value.filter(p =>
-    p.product_name?.toLowerCase().includes(searchTerm.value.toLowerCase())
-  )
+  return products.value.filter(p => {
+    const matchSearch = !searchTerm.value ||
+      p.product_name?.toLowerCase().includes(searchTerm.value.toLowerCase())
+
+    const matchCategory = !filterCategory.value ||
+      p.category_id === filterCategory.value
+
+    return matchSearch && matchCategory
+  })
 })
+
+const clearFilter = () => {
+  filterCategory.value = null
+  searchTerm.value = ''
+}
 
 const openAdd = () => {
   editingProduct.value = null

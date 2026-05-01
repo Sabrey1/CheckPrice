@@ -1,5 +1,7 @@
 <template>
-  <Dialog
+  <div>
+    <Button  />
+      <Dialog
     v-model:visible="visible"
     modal
     header="ព័ត៌មានផលិតផល"
@@ -44,11 +46,13 @@
       </tbody>
     </table>
   </Dialog>
+  </div>
 </template>
 
 <script setup>
 import { computed } from 'vue'
 import Avatar from 'primevue/avatar'
+import Dialog from 'primevue/dialog'
 
 const props = defineProps({
   product: Object,
