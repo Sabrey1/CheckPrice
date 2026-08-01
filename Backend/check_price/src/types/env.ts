@@ -1,5 +1,3 @@
 export interface Env {
-  Bindings: {
-    DB: D1Database;
-  };
+  DB: D1Database;
 }
