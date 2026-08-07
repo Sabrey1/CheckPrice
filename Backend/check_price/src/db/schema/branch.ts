@@ -13,7 +13,7 @@ export const branchs = sqliteTable("branchs", {
     address: text("address").notNull(),
     phone: text("phone").notNull(),
     status: text("status").notNull(),
-    created_at: integer("created_at").notNull(),
+    created_at: integer("created_at"),
 });
 
 export const branchesRelations = relations(branchs, ({ many }) => ({
