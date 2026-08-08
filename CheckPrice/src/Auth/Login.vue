@@ -8,11 +8,11 @@
 
       <template #content>
         <div class="field">
-          <label>Email</label>
+          <label>Username</label>
           <InputText
-            v-model="email"
-            type="email"
-            placeholder="Enter your email"
+            v-model="username"
+            type="text"
+            placeholder="Enter your username"
             class="w-full"
           />
         </div>
@@ -57,53 +57,55 @@ import Button from 'primevue/button'
 
 const router = useRouter()
 
-const email = ref('')
+const username = ref('')
 const password = ref('')
 const errorMsg = ref('')
 const loading = ref(false)
 
 const signIn = async () => {
-  loading.value = true
   errorMsg.value = ''
 
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email: email.value,
-    password: password.value,
-  })
-
-  loading.value = false
-
-  if (error) {
-    errorMsg.value = error.message
+  if (!username.value || !password.value) {
+    errorMsg.value = 'Please enter username and password'
     return
   }
 
-  const user = data.user
-  if (!user) {
-    errorMsg.value = 'User not found'
-    return
-  }
+  loading.value = true
 
-  const { data: profile, error: profileError } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .single()
+  try {
+    const response = await fetch('http://127.0.0.1:8787/api/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        username: username.value,
+        password: password.value,
+      }),
+    })
 
-  if (profileError || !profile) {
-    errorMsg.value = 'Profile not found. Contact admin.'
-    return
+    const result = await response.json()
+
+    if (!response.ok || !result.success) {
+      errorMsg.value = result.message || 'Login failed'
+      return
+    }
+
+    const user = result.data
+
+    localStorage.setItem('user', JSON.stringify(user))
+    localStorage.setItem('userRole', String(user.role_id))
+    localStorage.setItem('userId', String(user.id))
+
+    await router.push('/')
+  } catch (error) {
+    console.error(error)
+    errorMsg.value = 'Unable to connect to server'
+  } finally {
+    loading.value = false
   }
-    router.push('/').then(() => {
-  window.location.reload()
-})
 }
-
-
 </script>
-
-
-
 
 <style scoped>
 .login-container {
