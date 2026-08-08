@@ -47,7 +47,7 @@
         </template>
       </Column>
 
-      <Column field="category_name" class="p-0" header="ឈ្មោះប្រភេទ" />
+      <Column field="name" class="p-0" header="ឈ្មោះប្រភេទ" />
       <Column field="description" v-if="!isMobile" header="ពិពណ៌នា" />
 
       <Column v-if="!isMobile" header="ថ្ងៃបង្កើត">
@@ -92,7 +92,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted,onBeforeUnmount  } from 'vue'
 import { useRouter } from 'vue-router'
 import { supabase } from '@/supabase'
 import { useToast } from 'primevue/usetoast'
@@ -108,14 +108,20 @@ import ConfirmDialog from 'primevue/confirmdialog'
 import { useConfirm } from 'primevue/useconfirm'
 import Menu from 'primevue/menu'
 
+import { useCategory } from '@/composable/useCategory'
+
+const { getCategory,categories } = useCategory()
+
+
+
+
 const { isMobile } = useDevice()
 const toast = useToast()
 const confirm = useConfirm()
 const router = useRouter()
 
 // Table / Dialog state
-const visible = ref(false)
-const categories = ref([])
+const visible = ref(false) 
 const loading = ref(false)
 const saving = ref(false)
 
@@ -132,32 +138,14 @@ const selectedCategory = ref(null)
 const userRole = ref('')
 
 onMounted(async () => {
-  // Load categories
-  loading.value = true
-  const { data: categoryData, error: categoryError } = await supabase
-    .from('Category')
-    .select('*')
-    .order('created_at', { ascending: false })
+    window.addEventListener('resize', isMobile)
 
-  if (!categoryError) categories.value = categoryData
-  else console.error(categoryError)
-  loading.value = false
+  await getCategory() 
+})
 
-  // Get current session
-  const { data: { session } } = await supabase.auth.getSession()
-  if (!session || !session.user) return
 
-  // Get role from profiles table
-  const { data: profile, error: profileError } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', session.user.id)
-    .single()
-
-  if (profileError || !profile?.role) userRole.value = 'user'
-  else userRole.value = profile.role
-
-  localStorage.setItem('userRole', userRole.value)
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', isMobile)
 })
 
 const checkLogin = () => {

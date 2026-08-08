@@ -5,14 +5,18 @@ import {
 } from "drizzle-orm/sqlite-core";
 
 import { categories } from "./categories";
-import { relations } from "drizzle-orm";
-import { product_prices } from "./product_prices";
+import { branchs } from "./branch";
+import { relations } from "drizzle-orm"; 
 
 
 export const products = sqliteTable("products", {
     id: integer("id").primaryKey({ autoIncrement: true }),
-    name: text("name").notNull(),
     category_id: integer("category_id").notNull(),
+    branch_id: integer("branch_id").notNull(),
+    name: text("name").notNull(),
+    cost_price: text("cost_price"),
+    sale_price: text("sale_price"),
+    description: text("description"),
     image: text("image"),
     created_at: integer("created_at"),
 });
@@ -23,6 +27,8 @@ export const productsRelations = relations(products, ({ one, many }) => ({
     fields: [products.category_id],
     references: [categories.id],
   }),
-
-  prices: many(product_prices),
+  branch: one(branchs, {
+    fields: [products.branch_id],
+    references: [branchs.id],
+  }),
 }));

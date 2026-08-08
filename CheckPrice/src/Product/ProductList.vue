@@ -74,18 +74,18 @@
     <!-- TABLE -->
     <DataTable :value="filteredProducts" stripedRows :loading="loading">
         <template #empty>
-    <div class="text-center p-3">
-      មិនមានទិន្នន័យ
-    </div>
-  </template>
+          <div class="text-center p-3">
+            មិនមានទិន្នន័យ
+          </div>
+        </template>
       <Column header="ល.រ">
         <template #body="slotProps">
           {{ slotProps.index + 1 }}
         </template>
       </Column>
 
-      <Column field="product_name" header="ឈ្មោះ" />
-      <Column field="price" header="តម្លៃ" />
+      <Column field="name" header="ឈ្មោះ" />
+      <Column field="sale_price" header="តម្លៃ" />
 
       <Column v-if="!isMobile" header="ថ្ងៃបង្កើត">
         <template #body="slotProps">
@@ -146,6 +146,9 @@ import ConfirmDialog from 'primevue/confirmdialog'
 import Menu from 'primevue/menu'
 import { useDevice } from '@/hook/useDevice.js'
 
+import { useProduct} from '@/composable/useProduct.js'
+const { getProduct,product } = useProduct()
+
 const { isMobile } = useDevice()
 const router = useRouter()
 
@@ -153,7 +156,6 @@ const router = useRouter()
 const visible = ref(false)
 const loading = ref(false)
 const saving = ref(false)
-const products = ref([])
 const categories = ref([])
 const menu = ref(null)
 const menuItems = ref([])
@@ -253,6 +255,7 @@ function openView(product) {
 }
 
 onMounted(async () => {
+  getProduct()
   await fetchProducts()
   await fetchCategories()
   // preload user role
@@ -260,7 +263,7 @@ onMounted(async () => {
 })
 
 const filteredProducts = computed(() => {
-  return products.value.filter(p => {
+  return product.value.filter(p => {
     const matchSearch = !searchTerm.value ||
       p.product_name?.toLowerCase().includes(searchTerm.value.toLowerCase())
 

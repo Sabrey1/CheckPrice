@@ -2,10 +2,11 @@ import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 
 
-
-import { Routercategory } from './routes/category'
-import { Routerbranch } from './routes/branch'
 import { login } from './routes/auth'
+import { Routercategory } from './routes/category'
+import { Routerproduct } from './routes/product'
+import { Routerbranch } from './routes/branch'
+
 
 const app = new Hono()
 
@@ -27,6 +28,7 @@ app.get('/', (c) => {
 
 app.route('/api/login', login)
 app.route('/api/category', Routercategory)
+app.route('/api/product', Routerproduct)
 app.route('/api/branch', Routerbranch)
 
 export default app

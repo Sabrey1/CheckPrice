@@ -15,6 +15,20 @@
       "when": 1786104270932,
       "tag": "0001_powerful_vulcan",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1786174520914,
+      "tag": "0002_kind_moonstone",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1786174883763,
+      "tag": "0003_modern_garia",
+      "breakpoints": true
     }
   ]
 }
