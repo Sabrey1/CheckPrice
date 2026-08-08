@@ -94,7 +94,6 @@
 <script setup>
 import { ref, onMounted,onBeforeUnmount  } from 'vue'
 import { useRouter } from 'vue-router'
-import { supabase } from '@/supabase'
 import { useToast } from 'primevue/usetoast'
 import { useDevice } from '@/hook/useDevice.js'
 
@@ -111,9 +110,6 @@ import Menu from 'primevue/menu'
 import { useCategory } from '@/composable/useCategory'
 
 const { getCategory,categories } = useCategory()
-
-
-
 
 const { isMobile } = useDevice()
 const toast = useToast()
@@ -203,49 +199,49 @@ const closeDialog = () => {
   editingCategory.value = null
 }
 
-const saveCategory = async () => {
-  if (!categoryName.value) {
-    toast.add({ severity: 'warn', summary: 'Warning', detail: 'សូមបញ្ចូលឈ្មោះប្រភេទ', life: 3000 })
-    return
-  }
+// const saveCategory = async () => {
+//   if (!categoryName.value) {
+//     toast.add({ severity: 'warn', summary: 'Warning', detail: 'សូមបញ្ចូលឈ្មោះប្រភេទ', life: 3000 })
+//     return
+//   }
 
-  try {
-    saving.value = true
-    if (editingCategory.value) {
-      const { error } = await supabase
-        .from('Category')
-        .update({ category_name: categoryName.value, description: description.value })
-        .eq('id', editingCategory.value.id)
-      if (error) throw error
+//   try {
+//     saving.value = true
+//     if (editingCategory.value) {
+//       const { error } = await supabase
+//         .from('Category')
+//         .update({ category_name: categoryName.value, description: description.value })
+//         .eq('id', editingCategory.value.id)
+//       if (error) throw error
 
-      const index = categories.value.findIndex(c => c.id === editingCategory.value.id)
-      if (index !== -1) {
-        categories.value[index].category_name = categoryName.value
-        categories.value[index].description = description.value
-      }
+//       const index = categories.value.findIndex(c => c.id === editingCategory.value.id)
+//       if (index !== -1) {
+//         categories.value[index].category_name = categoryName.value
+//         categories.value[index].description = description.value
+//       }
 
-      toast.add({ severity: 'success', summary: 'Success', detail: 'បានកែប្រែជោគជ័យ', life: 3000 })
-    } else {
-      const { data, error } = await supabase
-        .from('Category')
-        .insert({ category_name: categoryName.value, description: description.value })
-        .select()
-        .single()
-      if (error) throw error
-      categories.value.unshift(data)
-      toast.add({ severity: 'success', summary: 'Success', detail: 'បានរក្សាទុកជោគជ័យ', life: 3000 })
-    }
+//       toast.add({ severity: 'success', summary: 'Success', detail: 'បានកែប្រែជោគជ័យ', life: 3000 })
+//     } else {
+//       const { data, error } = await supabase
+//         .from('Category')
+//         .insert({ category_name: categoryName.value, description: description.value })
+//         .select()
+//         .single()
+//       if (error) throw error
+//       categories.value.unshift(data)
+//       toast.add({ severity: 'success', summary: 'Success', detail: 'បានរក្សាទុកជោគជ័យ', life: 3000 })
+//     }
 
-    closeDialog()
-    categoryName.value = ''
-    description.value = ''
-  } catch (err) {
-    console.error(err)
-    toast.add({ severity: 'error', summary: 'Error', detail: err.message, life: 4000 })
-  } finally {
-    saving.value = false
-  }
-}
+//     closeDialog()
+//     categoryName.value = ''
+//     description.value = ''
+//   } catch (err) {
+//     console.error(err)
+//     toast.add({ severity: 'error', summary: 'Error', detail: err.message, life: 4000 })
+//   } finally {
+//     saving.value = false
+//   }
+// }
 
 // Delete Category
 const confirmDelete = (category) => {
@@ -259,20 +255,20 @@ const confirmDelete = (category) => {
   })
 }
 
-const deleteCategory = async (category) => {
-  try {
-    loading.value = true
-    const { error } = await supabase.from('Category').delete().eq('id', category.id)
-    if (error) throw error
-    categories.value = categories.value.filter(c => c.id !== category.id)
-    toast.add({ severity: 'success', summary: 'Success', detail: 'បានលុបជោគជ័យ', life: 3000 })
-  } catch (err) {
-    console.error(err)
-    toast.add({ severity: 'error', summary: 'Error', detail: err.message, life: 4000 })
-  } finally {
-    loading.value = false
-  }
-}
+// const deleteCategory = async (category) => {
+//   try {
+//     loading.value = true
+//     const { error } = await supabase.from('Category').delete().eq('id', category.id)
+//     if (error) throw error
+//     categories.value = categories.value.filter(c => c.id !== category.id)
+//     toast.add({ severity: 'success', summary: 'Success', detail: 'បានលុបជោគជ័យ', life: 3000 })
+//   } catch (err) {
+//     console.error(err)
+//     toast.add({ severity: 'error', summary: 'Error', detail: err.message, life: 4000 })
+//   } finally {
+//     loading.value = false
+//   }
+// }
 
 const mobileMenu = (category, event) => {
   selectedCategory.value = category
