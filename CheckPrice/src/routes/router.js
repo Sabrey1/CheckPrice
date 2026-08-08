@@ -3,6 +3,9 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import CategoryList from '@/Category/CategoryList.vue'
 import Products from '@/Product/ProductList.vue'
+import RoleList from '@/Role/RoleList.vue'
+import UserList from '@/User/UserList.vue'
+import BranchList from '@/Branch/BranchList.vue'
 import Login from '@/Auth/Login.vue'
 // Define routes
 const routes = [
@@ -22,6 +25,24 @@ const routes = [
     name: 'CategoryList',
     component: CategoryList,
     meta: { title: 'ឈ្មោះប្រភេទ' }
+  },
+  {
+    path: '/role',
+    name: 'RoleList',
+    component: RoleList,
+    meta: { title: 'តួនាទី' }
+  },
+  {
+    path: '/user',
+    name: 'UserList',
+    component: UserList,
+    meta: { title: 'អ្នកប្រើប្រាស់' }
+  },
+  {
+    path: '/branch',
+    name: 'BranchList',
+    component: BranchList,
+    meta: { title: 'សាខា' }
   },
 //   {
 //     path: '/:pathMatch(.*)*',

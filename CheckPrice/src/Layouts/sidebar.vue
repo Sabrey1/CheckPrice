@@ -29,6 +29,33 @@
             <span>ឈ្មោះប្រភេទ</span>
           </RouterLink>
         </li>
+        <li>
+          <RouterLink
+            to="/role"
+            class="flex align-items-center p-3 border-round hover:surface-700 text-white no-underline"
+          >
+            <i class="pi pi-objects-column mr-3"></i>
+            <span>តួនាទី</span>
+          </RouterLink>
+        </li>
+        <li>
+          <RouterLink
+            to="/user"
+            class="flex align-items-center p-3 border-round hover:surface-700 text-white no-underline"
+          >
+            <i class="pi pi-objects-column mr-3"></i>
+            <span>អ្នកប្រើប្រាស់</span>
+          </RouterLink>
+        </li>
+        <li>
+          <RouterLink
+            to="/branch"
+            class="flex align-items-center p-3 border-round hover:surface-700 text-white no-underline"
+          >
+            <i class="pi pi-objects-column mr-3"></i>
+            <span>សាខា</span>
+          </RouterLink>
+        </li>
       </ul>
 
       <div class="p-2 border-top-1 border-700">
