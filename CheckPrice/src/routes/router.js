@@ -3,7 +3,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import CategoryList from '@/Category/CategoryList.vue'
 import Products from '@/Product/ProductList.vue'
-import RoleList from '@/Role/RoleList.vue'
+import RoleList from '@/Role/Rolelist.vue'
 import UserList from '@/User/UserList.vue'
 import BranchList from '@/Branch/BranchList.vue'
 import Login from '@/Auth/Login.vue'
