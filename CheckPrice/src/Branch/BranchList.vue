@@ -1,6 +1,5 @@
 <template>
-    <div class="w-full"> 
-        {{ branch }}
+    <div class="w-full">
         <DataTable :value="branch" tableStyle="min-width: 50rem">
             <Column header="ល.រ">
                 <template #body="slotProps">

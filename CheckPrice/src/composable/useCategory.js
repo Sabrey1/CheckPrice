@@ -1,13 +1,12 @@
 
 import { ref } from 'vue'
-import axios from 'axios'
+import axios from '../../services/axios.js'
 
 const categories = ref([])
 const loading = ref(false)
 const saving = ref(false)
 const userRole = ref('')
-
-const API_URL = import.meta.env.VITE_BASE_URL
+ 
 
 export function useCategory() {
 
@@ -17,7 +16,7 @@ export function useCategory() {
   async function getCategory() {
     loading.value = true
 
-    const response = await axios.get(`${API_URL}/category`)
+    const response = await axios.get('api/category')
 
     if (response.data.success) {
       categories.value = response.data.data
@@ -32,7 +31,7 @@ export function useCategory() {
   // GET CATEGORY BY ID
   // =========================
   async function getCategoryById(id) {
-    const response = await axios.get(`${API_URL}/api/category/${id}`)
+    const response = await axios.get('/api/category/${id}')
 
     if (response.data.success) {
       return response.data.data
@@ -50,7 +49,7 @@ export function useCategory() {
     saving.value = true
 
     const response = await axios.post(
-      `${API_URL}/api/category`,
+      '/api/category',
       {
         category_name: category.category_name,
         description: category.description,
@@ -76,7 +75,7 @@ export function useCategory() {
     saving.value = true
 
     const response = await axios.put(
-      `${API_URL}/api/category/${id}`,
+       '/api/category/${id}',
       {
         category_name: category.category_name,
         description: category.description,
@@ -100,7 +99,7 @@ export function useCategory() {
   // =========================
   async function deleteCategory(id) {
     const response = await axios.delete(
-      `${API_URL}/api/category/${id}`
+       '/api/category/${id}'
     )
 
     if (response.data.success) {

@@ -48,15 +48,16 @@
 
 <script setup>
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { supabase } from '@/supabase'
+import { useRouter } from 'vue-router' 
 import Card from 'primevue/card'
 import InputText from 'primevue/inputtext'
 import Password from 'primevue/password'
 import Button from 'primevue/button'
 
+import axios from '../../services/axios.js'
+import useAuth from '@/composable/useAuth'
 const router = useRouter()
-
+const { setUser } = useAuth()
 const username = ref('')
 const password = ref('')
 const errorMsg = ref('')
@@ -65,42 +66,39 @@ const loading = ref(false)
 const signIn = async () => {
   errorMsg.value = ''
 
-  if (!username.value || !password.value) {
-    errorMsg.value = 'Please enter username and password'
+  if (!username.value.trim() || !password.value) {
+    errorMsg.value = 'Username and password are required'
     return
   }
 
   loading.value = true
 
   try {
-    const response = await fetch('http://127.0.0.1:8787/api/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        username: username.value,
-        password: password.value,
-      }),
+    console.log('Sending:', {
+      username: username.value,
+      password: password.value
     })
 
-    const result = await response.json()
+    const response = await axios.post('api/login', {
+      username: username.value.trim(),
+      password: password.value
+    })
 
-    if (!response.ok || !result.success) {
-      errorMsg.value = result.message || 'Login failed'
-      return
+    console.log('Login response:', response.data)
+
+    if (response.data.success) {
+      setUser(response.data.data)
+
+      await router.push('/')
+    } else {
+      errorMsg.value = response.data.message || 'Login failed'
     }
-
-    const user = result.data
-
-    localStorage.setItem('user', JSON.stringify(user))
-    localStorage.setItem('userRole', String(user.role_id))
-    localStorage.setItem('userId', String(user.id))
-
-    await router.push('/')
   } catch (error) {
-    console.error(error)
-    errorMsg.value = 'Unable to connect to server'
+    console.error('Login error:', error)
+
+    errorMsg.value =
+      error.response?.data?.message ||
+      'Unable to connect to the server'
   } finally {
     loading.value = false
   }

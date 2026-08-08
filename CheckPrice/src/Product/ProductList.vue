@@ -138,8 +138,7 @@
 
 <script setup>
 import { ref, onMounted, computed } from 'vue'
-import { useRouter } from 'vue-router'
-import { supabase } from '@/supabase'
+import { useRouter } from 'vue-router' 
 
 import ProductView from '@/Product/ProductView.vue'
 import ConfirmDialog from 'primevue/confirmdialog'
@@ -170,45 +169,45 @@ const filterCategory = ref(null)
 const viewDialog = ref(false)
 // const selectedProduct = ref(null)
   
-const fetchProducts = async () => {
-  loading.value = true
-  const { data, error } = await supabase
-    .from('Product')
-    .select('*')
-    .order('created_at', { ascending: false })
-  if (!error) products.value = data
-  loading.value = false
-}
+// const fetchProducts = async () => {
+//   loading.value = true
+//   const { data, error } = await supabase
+//     .from('Product')
+//     .select('*')
+//     .order('created_at', { ascending: false })
+//   if (!error) products.value = data
+//   loading.value = false
+// }
 
-const fetchCategories = async () => {
-  const { data } = await supabase.from('Category').select('id, category_name')
-  categories.value = data || []
-}
+// const fetchCategories = async () => {
+//   const { data } = await supabase.from('Category').select('id, category_name')
+//   categories.value = data || []
+// }
 
-const getCurrentUserRole = async () => {
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return null
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .single()
-  return profile?.role || null
-}
+// const getCurrentUserRole = async () => {
+//   const { data: { user } } = await supabase.auth.getUser()
+//   if (!user) return null
+//   const { data: profile } = await supabase
+//     .from('profiles')
+//     .select('role')
+//     .eq('id', user.id)
+//     .single()
+//   return profile?.role || null
+// }
 
-// async login check
-const checkLogin = async () => {
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) {
-    router.push('/login')
-    return false
-  }
-  // if role not loaded, load it
-  if (!userRole.value) {
-    userRole.value = await getCurrentUserRole()
-  }
-  return true
-}
+// // async login check
+// const checkLogin = async () => {
+//   const { data: { user } } = await supabase.auth.getUser()
+//   if (!user) {
+//     router.push('/login')
+//     return false
+//   }
+//   // if role not loaded, load it
+//   if (!userRole.value) {
+//     userRole.value = await getCurrentUserRole()
+//   }
+//   return true
+// }
 
 const checkLoginAndOpenAdd = async () => {
   const loggedIn = await checkLogin()
@@ -256,10 +255,8 @@ function openView(product) {
 
 onMounted(async () => {
   getProduct()
-  await fetchProducts()
-  await fetchCategories()
   // preload user role
-  userRole.value = await getCurrentUserRole()
+  // userRole.value = await getCurrentUserRole()
 })
 
 const filteredProducts = computed(() => {
@@ -300,42 +297,42 @@ const closeDialog = () => {
   editingProduct.value = null
 }
 
-const saveProduct = async () => {
-  if (!productName.value || !productPrice.value || !selectedCategory.value) {
-    alert('សូមបំពេញព័ត៌មានទាំងអស់')
-    return
-  }
+// const saveProduct = async () => {
+//   if (!productName.value || !productPrice.value || !selectedCategory.value) {
+//     alert('សូមបំពេញព័ត៌មានទាំងអស់')
+//     return
+//   }
 
-  saving.value = true
-  const payload = {
-    product_name: productName.value,
-    price: productPrice.value,
-    category_id: selectedCategory.value
-  }
+//   saving.value = true
+//   const payload = {
+//     product_name: productName.value,
+//     price: productPrice.value,
+//     category_id: selectedCategory.value
+//   }
 
-  let result
-  if (editingProduct.value) {
-    result = await supabase.from('Product').update(payload).eq('id', editingProduct.value.id)
-  } else {
-    result = await supabase.from('Product').insert(payload)
-  }
+//   let result
+//   if (editingProduct.value) {
+//     result = await supabase.from('Product').update(payload).eq('id', editingProduct.value.id)
+//   } else {
+//     result = await supabase.from('Product').insert(payload)
+//   }
 
-  if (!result.error) {
-    await fetchProducts()
-    closeDialog()
-  } else {
-    console.error(result.error)
-    alert('Save failed')
-  }
+//   if (!result.error) {
+//     await fetchProducts()
+//     closeDialog()
+//   } else {
+//     console.error(result.error)
+//     alert('Save failed')
+//   }
 
-  saving.value = false
-}
+//   saving.value = false
+// }
 
-const deleteProduct = async (product) => {
-  if (!confirm('តើអ្នកចង់លុបផលិតផលនេះមែនទេ?')) return
-  const { error } = await supabase.from('Product').delete().eq('id', product.id)
-  if (!error) products.value = products.value.filter(p => p.id !== product.id)
-}
+// const deleteProduct = async (product) => {
+//   if (!confirm('តើអ្នកចង់លុបផលិតផលនេះមែនទេ?')) return
+//   const { error } = await supabase.from('Product').delete().eq('id', product.id)
+//   if (!error) products.value = products.value.filter(p => p.id !== product.id)
+// }
 </script>
 
 <style scoped>

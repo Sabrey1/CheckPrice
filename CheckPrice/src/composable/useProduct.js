@@ -4,7 +4,7 @@ const product = ref([])
 
 export function useProduct(){
    async function getProduct(){
-        const res = await axios.get('/product')
+        const res = await axios.get('api/product')
         if(res.data.success){
             product.value = res.data.data
         }

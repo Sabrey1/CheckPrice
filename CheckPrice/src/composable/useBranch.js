@@ -4,7 +4,7 @@ const branch = ref([])
 
 export function useBranch(){
    async function getBranch(){
-        const res = await axios.get('/branch')
+        const res = await axios.get('api/branch')
         if(res.data.success){
             branch.value = res.data.data
         }
