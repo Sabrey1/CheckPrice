@@ -7,5 +7,6 @@ import {
 export const roles = sqliteTable("roles", {
     id: integer("id").primaryKey({ autoIncrement: true }),
     name: text("name").notNull(),
+    branch_id: integer("branch_id"),
     created_at: integer("created_at"),
 });

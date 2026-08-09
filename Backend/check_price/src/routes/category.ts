@@ -10,7 +10,13 @@ export const Routercategory = new Hono<{ Bindings: Env }>();
 Routercategory.get("/", async (c) => {
   const db = getDB(c.env.DB);
 
-  const data = await db.select().from(categories).all();
+  const branchId = c.req.query("branch_id");
+
+  const data = await db.select().from(categories).where(
+    branchId
+            ? eq(categories.branch_id, Number(branchId))
+            : undefined
+  ).all();
 
   return c.json({
     success: true,

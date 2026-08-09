@@ -29,6 +29,34 @@
       "when": 1786174883763,
       "tag": "0003_modern_garia",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1786245595823,
+      "tag": "0004_living_thanos",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1786245829236,
+      "tag": "0005_slimy_romulus",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1786246474003,
+      "tag": "0006_sturdy_molten_man",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "6",
+      "when": 1786246738909,
+      "tag": "0007_petite_vengeance",
+      "breakpoints": true
     }
   ]
 }

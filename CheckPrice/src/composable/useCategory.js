@@ -16,7 +16,22 @@ export function useCategory() {
   async function getCategory() {
     loading.value = true
 
-    const response = await axios.get('api/category')
+    const userString = localStorage.getItem('user')
+
+    if (!userString) {
+      console.log('User not found')
+      return
+    }
+
+    const user = JSON.parse(userString)
+
+    const branchId = user?.branch_id
+
+    const response = await axios.get('api/category',{
+      params: {
+        branch_id: branchId,
+      },
+    })
 
     if (response.data.success) {
       categories.value = response.data.data
