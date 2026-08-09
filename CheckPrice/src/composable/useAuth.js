@@ -10,8 +10,6 @@ export function useAuth() {
 
   const setUser = (user) => {
     localStorage.setItem('user', JSON.stringify(user))
-    localStorage.setItem('userRole', String(user.role_id))
-    localStorage.setItem('userId', String(user.id))
 
     userRole.value = String(user.role_id)
   }
@@ -48,9 +46,7 @@ export function useAuth() {
   }
 
   const logout = async () => {
-    localStorage.removeItem('user')
-    localStorage.removeItem('userRole')
-    localStorage.removeItem('userId')
+    localStorage.removeItem('user') 
 
     userRole.value = ''
 

@@ -74,18 +74,13 @@ const signIn = async () => {
   loading.value = true
 
   try {
-    console.log('Sending:', {
-      username: username.value,
-      password: password.value
-    })
+     
 
     const response = await axios.post('api/login', {
       username: username.value.trim(),
       password: password.value
     })
-
-    console.log('Login response:', response.data)
-
+ 
     if (response.data.success) {
       setUser(response.data.data)
 

@@ -10,8 +10,17 @@ export const Routerproduct = new Hono<{ Bindings: Env }>();
 Routerproduct.get("/", async (c) => {
   const db = getDB(c.env.DB);
 
-  const data = await db.select().from(products).all();
+  const branchId = c.req.query("branch_id");
 
+  const data = await db
+    .select()
+    .from(products)
+    .where(
+      branchId
+        ? eq(products.branch_id, Number(branchId))
+        : undefined
+    )
+    .all();
   return c.json({
     success: true,
     data,
