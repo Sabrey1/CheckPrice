@@ -7,6 +7,7 @@
             label="បន្ថែមប្រភេទ"
             icon="pi pi-plus"
             severity="success"
+            :disabled="userRole !== 'admin'"
             
             @click="checkLoginAndOpenAdd"
           />

@@ -29,7 +29,7 @@
             <span>ឈ្មោះប្រភេទ</span>
           </RouterLink>
         </li>
-        <li>
+        <li v-if="userRole === 'admin'">
           <RouterLink
             to="/role"
             class="flex align-items-center p-3 border-round hover:surface-700 text-white no-underline"
@@ -38,7 +38,7 @@
             <span>តួនាទី</span>
           </RouterLink>
         </li>
-        <li>
+        <li v-if="userRole === 'admin'">
           <RouterLink
             to="/user"
             class="flex align-items-center p-3 border-round hover:surface-700 text-white no-underline"
@@ -47,7 +47,7 @@
             <span>អ្នកប្រើប្រាស់</span>
           </RouterLink>
         </li>
-        <li>
+        <li v-if="userRole === 'admin'">
           <RouterLink
             to="/branch"
             class="flex align-items-center p-3 border-round hover:surface-700 text-white no-underline"
@@ -104,6 +104,25 @@ const router = useRouter()
 const visible = ref(false)
 const isLoggedIn = ref(false)
 
+const userRole = ref('')
+
+
+  function getUserRole() {
+  const user = localStorage.getItem('user')
+
+  if (!user) {
+    return null
+  }
+
+  const userRoles = JSON.parse(user)
+
+  userRole.value =  userRoles.role_name || ''
+
+  console.log(userRole.value)
+ 
+  return userRole.value
+}
+
 
 /* ✅ Check login status from localStorage */
 const checkLogin = () => {
@@ -113,6 +132,7 @@ const checkLogin = () => {
 /* Run on page load */
 onMounted(() => {
   checkLogin()
+  getUserRole()
 })
 
 /* Sidebar logic */
