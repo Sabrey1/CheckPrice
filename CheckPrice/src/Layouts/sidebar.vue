@@ -81,7 +81,7 @@
           <span class="ml-2 font-bold text-2xl">{{ pageTitle }}</span>
         </div>
          <div>
-          <Button   v-if="!isLoggedIn" label="Login" class="p-button-text" @click="login" />  
+          <Button v-if="!isLoggedIn" label="Login" class="p-button-text" @click="login" />  
          </div>
       </div>
 
@@ -98,17 +98,16 @@ import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import Button from 'primevue/button'
 
-const AUTH_KEY = 'sb-mzgtiuvtgzhmmkylduja-auth-token'
-
 const route = useRoute()
 const router = useRouter()
 
 const visible = ref(false)
 const isLoggedIn = ref(false)
 
+
 /* ✅ Check login status from localStorage */
 const checkLogin = () => {
-  isLoggedIn.value = !!localStorage.getItem(AUTH_KEY)
+  isLoggedIn.value = localStorage.getItem('user')
 }
 
 /* Run on page load */
@@ -131,7 +130,7 @@ const login = () => {
 
 /* ✅ Logout */
 const logout = () => {
-  localStorage.removeItem(AUTH_KEY)
+  localStorage.removeItem('user')
   isLoggedIn.value = false
   router.push('/login')
 }

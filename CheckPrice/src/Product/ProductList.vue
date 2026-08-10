@@ -39,6 +39,14 @@
             @click="downloadCategoryTemplate"
           />
       </div>
+
+       <input
+          ref="fileInput"
+          type="file"
+          accept=".csv"
+          style="display: none"
+          @change="handleImport"
+        />
     </div>
 
     <!-- FILTER -->

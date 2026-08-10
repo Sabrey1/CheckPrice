@@ -62,10 +62,13 @@ export function useCategory() {
   async function createCategory(category) {
     saving.value = true
 
+    const user = JSON.parse(localStorage.getItem('user'))
+
     const response = await axios.post(
       '/api/category',
       {
         name: category.category_name,
+         branch_id: user.branch_id,
         description: category.description,
       }
     )
@@ -118,11 +121,6 @@ export function useCategory() {
       await getCategory()
       return response.data.data
     }
-
-    console.error(
-      response.data.message || 'Failed to delete category'
-    )
-
     return null
   }
  

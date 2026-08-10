@@ -108,7 +108,7 @@
                 severity="danger"
                 class="p-button-primary"
                 :disabled="userRole !== 'admin'"
-                
+                @click="checkLoginAndDelete(slotProps.data)"
               />
 
             </template>
@@ -189,20 +189,11 @@ const menu = ref(null)
 const menuItems = ref([])
 const selectedCategory = ref(null)
 
-
-
- 
-
 onMounted(async () => {
   window.addEventListener('resize', isMobile)
-
- 
   await getUserRole()
-
- 
   await getCategory() 
 })
-
 
 onBeforeUnmount(() => {
   window.removeEventListener('resize', isMobile)
@@ -280,7 +271,7 @@ const openAdd = () => {
 
 const openEdit = (category) => {
   editingCategory.value = category
-  categoryName.value = category.category_name
+  categoryName.value = category.name
   description.value = category.description
   visible.value = true
 }
@@ -290,77 +281,117 @@ const closeDialog = () => {
   editingCategory.value = null
 }
 
-// const saveCategory = async () => {
-//   if (!categoryName.value) {
-//     toast.add({ severity: 'warn', summary: 'Warning', detail: 'សូមបញ្ចូលឈ្មោះប្រភេទ', life: 3000 })
-//     return
-//   }
+const saveCategory = async () => {
+  if (!categoryName.value.trim()) {
+    toast.add({
+      severity: 'warn',
+      summary: 'Warning',
+      detail: 'សូមបញ្ចូលឈ្មោះប្រភេទ',
+      life: 3000
+    })
+    return
+  }
 
-//   try {
-//     saving.value = true
-//     if (editingCategory.value) {
-//       const { error } = await supabase
-//         .from('Category')
-//         .update({ category_name: categoryName.value, description: description.value })
-//         .eq('id', editingCategory.value.id)
-//       if (error) throw error
+  try {
+    saving.value = true
 
-//       const index = categories.value.findIndex(c => c.id === editingCategory.value.id)
-//       if (index !== -1) {
-//         categories.value[index].category_name = categoryName.value
-//         categories.value[index].description = description.value
-//       }
+    const categoryData = {
+      category_name: categoryName.value.trim(),
+      branch_id: userRole.value === 'admin' ? null : localStorage.getItem('branch_id'),
+      description: description.value.trim()
+    }
 
-//       toast.add({ severity: 'success', summary: 'Success', detail: 'បានកែប្រែជោគជ័យ', life: 3000 })
-//     } else {
-//       const { data, error } = await supabase
-//         .from('Category')
-//         .insert({ category_name: categoryName.value, description: description.value })
-//         .select()
-//         .single()
-//       if (error) throw error
-//       categories.value.unshift(data)
-//       toast.add({ severity: 'success', summary: 'Success', detail: 'បានរក្សាទុកជោគជ័យ', life: 3000 })
-//     }
+    // Update existing category
+    if (editingCategory.value) {
+      const result = await updateCategory(
+        editingCategory.value.id,
+        categoryData
+      )
 
-//     closeDialog()
-//     categoryName.value = ''
-//     description.value = ''
-//   } catch (err) {
-//     console.error(err)
-//     toast.add({ severity: 'error', summary: 'Error', detail: err.message, life: 4000 })
-//   } finally {
-//     saving.value = false
-//   }
-// }
+      if (!result) {
+        toast.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'មិនអាចកែប្រែប្រភេទបានទេ',
+          life: 4000
+        })
+        return
+      }
+
+      toast.add({
+        severity: 'success',
+        summary: 'Success',
+        detail: 'បានកែប្រែជោគជ័យ',
+        life: 3000
+      })
+
+    } else {
+      // Create new category
+      const result = await createCategory(categoryData)
+
+      if (!result) {
+        toast.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'មិនអាចបន្ថែមប្រភេទបានទេ',
+          life: 4000
+        })
+        return
+      }
+
+      toast.add({
+        severity: 'success',
+        summary: 'Success',
+        detail: 'បានរក្សាទុកជោគជ័យ',
+        life: 3000
+      })
+    }
+
+    closeDialog()
+
+    categoryName.value = ''
+    description.value = ''
+
+  } catch (err) {
+    console.error('Save category error:', err)
+
+    toast.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: err?.message || 'មានបញ្ហាក្នុងការរក្សាទុកប្រភេទ',
+      life: 4000
+    })
+
+  } finally {
+    saving.value = false
+  }
+}
+
 
 // Delete Category
 const confirmDelete = (category) => {
   confirm.require({
-    message: 'តើអ្នកពិតជាចង់លុបប្រភេទនេះមែនទេ?',
+    message: `តើអ្នកពិតជាចង់លុប "${category.name}" មែនទេ?`,
     header: 'បញ្ជាក់ការលុប',
     icon: 'pi pi-exclamation-triangle',
     acceptLabel: 'លុប',
     rejectLabel: 'បោះបង់',
-    accept: () => deleteCategory(category)
+
+    accept: async () => {
+      const result = await deleteCategory(category.id)
+
+      if (result) {
+        toast.add({
+          severity: 'success',
+          summary: 'ជោគជ័យ',
+          detail: 'បានលុបប្រភេទជោគជ័យ',
+          life: 3000
+        })
+      }
+    }
   })
 }
-
-// const deleteCategory = async (category) => {
-//   try {
-//     loading.value = true
-//     const { error } = await supabase.from('Category').delete().eq('id', category.id)
-//     if (error) throw error
-//     categories.value = categories.value.filter(c => c.id !== category.id)
-//     toast.add({ severity: 'success', summary: 'Success', detail: 'បានលុបជោគជ័យ', life: 3000 })
-//   } catch (err) {
-//     console.error(err)
-//     toast.add({ severity: 'error', summary: 'Error', detail: err.message, life: 4000 })
-//   } finally {
-//     loading.value = false
-//   }
-// }
-
+ 
 const mobileMenu = (category, event) => {
   selectedCategory.value = category
   menuItems.value = [
