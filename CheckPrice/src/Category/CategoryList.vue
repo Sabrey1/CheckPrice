@@ -15,7 +15,7 @@
             label="នាំចូល CSV"
             icon="pi pi-upload"
             :loading="importing"
-            :disabled="userRole !== 'admin' || 'Admin'"
+            :disabled="userRole !== 'admin'"
             @click="openImport"
           />
 
