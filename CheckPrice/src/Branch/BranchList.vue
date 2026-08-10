@@ -1,6 +1,6 @@
 <template>
     <div class="w-full">
-        <DataTable :value="branch" tableStyle="min-width: 50rem">
+        <DataTable :value="branch" stripedRows :loading="loading"  >
             <Column header="ល.រ">
                 <template #body="slotProps">
                     {{ slotProps.index + 1 }}
@@ -8,9 +8,8 @@
             </Column>
             <Column field="name" header="ឈ្មោះ" /> 
             <Column field="phone" header="លេខទូរស័ព្ទ" /> 
-            <Column field="address" header="អាសយដ្ឋាន" /> 
-            <Column field="created_at" header="ថ្ងៃបង្កើត" /> 
-            <Column header="Action" >
+            <Column field="address" header="អាសយដ្ឋាន" />  
+            <Column  >
                 <template #body="slotProps">
                     <div class="flex gap-2 items-center justify-content-end">
                         <RoleView :role="slotProps.data" />

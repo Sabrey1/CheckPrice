@@ -4,7 +4,7 @@
     <div
       class="flex align-items-center gap-1 justify-content-between mb-1 btn"
     >
-      <div class="w-5">
+      <div  >
         <IconField>
           <InputIcon class="pi pi-search" />
           <InputText
@@ -23,6 +23,8 @@
           :disabled="userRole !== 'admin'"
           @click="checkLoginAndOpenAdd"
         />
+
+        <div class="flex gap-2" v-if="!isMobile">
 
         <!-- IMPORT -->
         <Button
@@ -50,6 +52,23 @@
           :loading="downloadingTemplate"
           @click="downloadProductCsvTemplate"
         />
+        </div>
+
+        <!-- MOBILE ACTIONS -->
+<div v-else>
+  <Button
+    icon="pi pi-ellipsis-v"
+    text
+    rounded
+    @click="toggleProductActionMenu"
+  />
+
+  <Menu
+    ref="productActionMenu"
+    :model="productActionItems"
+    :popup="true"
+  />
+</div>
       </div>
 
       <!-- HIDDEN FILE INPUT -->
@@ -297,6 +316,7 @@ const saving = ref(false)
 const categories = ref([])
 const menu = ref(null)
 const menuItems = ref([])
+const productActionMenu = ref(null)
 const productName = ref('')
 const costPrice = ref('')
 const productPrice = ref('')
@@ -333,6 +353,35 @@ function checkLogin() {
   isLoggedIn.value = true
   userRole.value = user?.role_name || ''
   return true
+}
+
+const productActionItems = computed(() => [
+  {
+    label: 'នាំចូល CSV',
+    icon: 'pi pi-upload',
+    disabled: userRole.value !== 'admin',
+    command: () => {
+      openImport()
+    }
+  },
+  {
+    label: 'នាំចេញ CSV',
+    icon: 'pi pi-download',
+    command: () => {
+      exportProductCsv()
+    }
+  },
+  {
+    label: 'Template',
+    icon: 'pi pi-file',
+    command: () => {
+      downloadProductCsvTemplate()
+    }
+  }
+])
+
+function toggleProductActionMenu(event) {
+  productActionMenu.value?.toggle(event)
 }
  
 async function getCategories() {

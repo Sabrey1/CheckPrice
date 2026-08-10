@@ -1,14 +1,14 @@
 <template>
     <div class="w-full">
-        <DataTable :value="role" tableStyle="min-width: 50rem">
+        <DataTable :value="role" stripedRows :loading="loading" >
             <Column header="ល.រ">
                 <template #body="slotProps">
                     {{ slotProps.index + 1 }}
                 </template>
             </Column>
             <Column field="name" header="ឈ្មោះ" /> 
-            <Column field="created_at" header="ថ្ងៃបង្កើត" /> 
-            <Column header="Action" >
+             
+            <Column  >
                 <template #body="slotProps">
                     <div class="flex gap-2 items-center justify-content-end">
                         <RoleView :role="slotProps.data" />
@@ -34,13 +34,22 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
-
+import { ref, onMounted,onBeforeUnmount } from 'vue';
+import { useDevice } from '@/hook/useDevice.js'
 import { useRole } from '@/composable/useRole.js'
 
 const { getRole,role } = useRole()
 
+const { isMobile } = useDevice()
+
 onMounted(() => {
+    window.addEventListener('resize', isMobile)
     getRole()
 })
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', isMobile)
+})
+
+
 </script>

@@ -1,6 +1,6 @@
 <template>
     <div class="w-full"> 
-        <DataTable :value="user" tableStyle="min-width: 50rem">
+        <DataTable :value="user"  >
             <Column header="ល.រ">
                 <template #body="slotProps">
                     {{ slotProps.index + 1 }}
@@ -9,7 +9,6 @@
             <Column field="username" header="ឈ្មោះ" /> 
             <Column field="phone" header="លេខទូរស័ព្ទ" /> 
             <Column field="email" header="អ៊ីមែល" /> 
-            <Column field="created_at" header="ថ្ងៃបង្កើត" /> 
             <Column header="Action" >
                 <template #body="slotProps">
                     <div class="flex gap-2 items-center justify-content-end">

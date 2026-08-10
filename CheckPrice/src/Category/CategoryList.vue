@@ -11,7 +11,8 @@
             
             @click="checkLoginAndOpenAdd"
           />
-
+          
+          <div  class="flex gap-2" v-if="!isMobile">
           <Button
             label="នាំចូល CSV"
             icon="pi pi-upload"
@@ -33,6 +34,23 @@
             severity="secondary"
             @click="downloadCategoryTemplate"
           />
+          </div>
+
+          <!-- Mobile -->
+  <div v-else>
+    <Button
+      icon="pi pi-ellipsis-v"
+      text
+      rounded
+      @click="toggleCategoryMenu"
+    />
+
+    <Menu
+      ref="categoryMenu"
+      :model="categoryMenuItems"
+      :popup="true"
+    />
+  </div>
 
         </div>
 
@@ -151,6 +169,8 @@ import Menu from 'primevue/menu'
 
 import { useCategory } from '@/composable/useCategory'
 
+const categoryMenu = ref(null)
+
 const {
   categories,
   loading,
@@ -189,6 +209,36 @@ const editingCategory = ref(null)
 const menu = ref(null)
 const menuItems = ref([])
 const selectedCategory = ref(null)
+
+
+const categoryMenuItems = ref([
+  {
+    label: 'នាំចូល CSV',
+    icon: 'pi pi-upload',
+    disabled: userRole === 'admin',
+    command: () => {
+      openImport()
+    }
+  },
+  {
+    label: 'នាំចេញ CSV',
+    icon: 'pi pi-download',
+    command: () => {
+      exportCategory()
+    }
+  },
+  {
+    label: 'Template',
+    icon: 'pi pi-file',
+    command: () => {
+      downloadCategoryTemplate()
+    }
+  }
+])
+
+const toggleCategoryMenu = (event) => {
+  categoryMenu.value.toggle(event)
+}
 
 onMounted(async () => {
   window.addEventListener('resize', isMobile)
