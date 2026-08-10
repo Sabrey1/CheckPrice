@@ -11,8 +11,8 @@ import { relations } from "drizzle-orm";
 
 export const products = sqliteTable("products", {
     id: integer("id").primaryKey({ autoIncrement: true }),
-    category_id: integer("category_id").notNull(),
-    branch_id: integer("branch_id").notNull(),
+    category_id: integer("category_id").notNull().references(() => categories.id),
+    branch_id: integer("branch_id").notNull().references(() => branchs.id),
     name: text("name").notNull(),
     cost_price: text("cost_price"),
     sale_price: text("sale_price"),

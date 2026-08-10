@@ -29,14 +29,14 @@
             label="នាំចេញ CSV"
             icon="pi pi-download"
             severity="success"
-            @click="exportCategory"
+            @click="exportProductCsv"
           />
 
           <Button
             label="Template"
             icon="pi pi-file"
             severity="secondary"
-            @click="downloadCategoryTemplate"
+            @click="downloadProductCsvTemplate"
           />
       </div>
 
@@ -176,14 +176,24 @@ import Menu from 'primevue/menu'
 import { useDevice } from '@/hook/useDevice.js'
 
 import { useProduct} from '@/composable/useProduct.js'
-const { getProduct,product } = useProduct()
+const { 
+  product,
+  loading, 
+  importing,
+  exporting, 
+  downloadingTemplate, 
+  getProduct, 
+  importProduct, 
+  exportProduct, 
+  downloadProductTemplate 
+} = useProduct() // File input 
+const fileInput = ref(null)
 
 const { isMobile } = useDevice()
 const router = useRouter()
 
 // STATE
 const visible = ref(false)
-const loading = ref(false)
 const saving = ref(false)
 const categories = ref([])
 const menu = ref(null)
@@ -198,6 +208,48 @@ const userRole = ref('') // track role
 const filterCategory = ref(null)
 const viewDialog = ref(false)
 // const selectedProduct = ref(null)
+
+
+function openImport() {
+  fileInput.value?.click()
+}
+
+async function handleImport(event) {
+  const file = event.target.files?.[0]
+
+  if (!file) {
+    return
+  }
+
+  try {
+    const result = await importProduct(file)
+
+    console.log('Import result:', result)
+
+  } catch (error) {
+    console.error('Import error:', error)
+  }
+
+  event.target.value = ''
+}
+async function exportProductCsv() {
+  try {
+    await exportProduct()
+  } catch (error) {
+    console.error('Export error:', error)
+  }
+}
+
+async function downloadProductCsvTemplate() {
+  try {
+    await downloadProductTemplate()
+  } catch (error) {
+    console.error('Template error:', error)
+  }
+}
+
+
+
   
 // const fetchProducts = async () => {
 //   loading.value = true

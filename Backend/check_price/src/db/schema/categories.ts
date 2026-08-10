@@ -4,6 +4,9 @@ import {
     text,
 } from "drizzle-orm/sqlite-core";
 
+import { products } from "./product";
+import { relations } from "drizzle-orm/relations";
+
 export const categories = sqliteTable("categories", {
     id: integer("id").primaryKey({ autoIncrement: true }),
     name: text("name").notNull(),
@@ -11,3 +14,7 @@ export const categories = sqliteTable("categories", {
     description: text("description"),
     created_at: integer("created_at"),
 });
+
+export const categoriesRelations = relations(categories, ({ many }) => ({
+  products: many(products),
+}));

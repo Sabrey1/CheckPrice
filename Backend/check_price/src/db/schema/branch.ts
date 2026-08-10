@@ -3,7 +3,7 @@ import {
     integer,
     text,
 } from "drizzle-orm/sqlite-core";
-import { product_prices } from "./product_prices";
+import { products } from "./product";
 import { users } from "./users";
 import { relations } from "drizzle-orm/relations";
 
@@ -18,5 +18,5 @@ export const branchs = sqliteTable("branchs", {
 
 export const branchesRelations = relations(branchs, ({ many }) => ({
   users: many(users),
-  prices: many(product_prices),
+  prices: many(products),
 }));
