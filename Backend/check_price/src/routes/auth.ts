@@ -48,11 +48,12 @@ login.post("/", async (c) => {
         branch_name: branchs.name,
         
         // Role name from roles table
-        role_name: roles.name
+        role_name: roles.name,
+        
       })
       .from(users)
       .leftJoin(branchs, eq(users.branch_id, branchs.id))
-      .leftJoin(roles, eq(users.branch_id, branchs.id))
+      .leftJoin(roles, eq(users.role_id, roles.id))
       .where(
         and(
           eq(users.username, username),

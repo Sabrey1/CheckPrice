@@ -57,6 +57,27 @@
       "when": 1786246738909,
       "tag": "0007_petite_vengeance",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "6",
+      "when": 1786328946108,
+      "tag": "0008_smooth_luke_cage",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "6",
+      "when": 1786329052961,
+      "tag": "0009_dear_reaper",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "6",
+      "when": 1786329175101,
+      "tag": "0010_flimsy_karen_page",
+      "breakpoints": true
     }
   ]
 }

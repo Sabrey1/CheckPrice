@@ -1,18 +1,16 @@
-
 import { ref } from 'vue'
 import axios from '../../services/axios.js'
 
 const categories = ref([])
 const loading = ref(false)
 const saving = ref(false)
+const importing = ref(false)
 const userRole = ref('')
- 
+
+const role_name = ref('')
 
 export function useCategory() {
-
-  // =========================
-  // GET ALL CATEGORIES
-  // =========================
+ 
   async function getCategory() {
     loading.value = true
 
@@ -20,6 +18,7 @@ export function useCategory() {
 
     if (!userString) {
       console.log('User not found')
+      loading.value = false
       return
     }
 
@@ -27,7 +26,7 @@ export function useCategory() {
 
     const branchId = user?.branch_id
 
-    const response = await axios.get('api/category',{
+    const response = await axios.get('/api/category', {
       params: {
         branch_id: branchId,
       },
@@ -36,37 +35,37 @@ export function useCategory() {
     if (response.data.success) {
       categories.value = response.data.data
     } else {
-      console.error(response.data.message || 'Failed to get categories')
+      console.error(
+        response.data.message || 'Failed to get categories'
+      )
     }
 
     loading.value = false
   }
-
-  // =========================
-  // GET CATEGORY BY ID
-  // =========================
+ 
   async function getCategoryById(id) {
-    const response = await axios.get('/api/category/${id}')
+    const response = await axios.get(
+      `/api/category/${id}`
+    )
 
     if (response.data.success) {
       return response.data.data
     }
 
-    console.error(response.data.message || 'Failed to get category')
+    console.error(
+      response.data.message || 'Failed to get category'
+    )
 
     return null
   }
-
-  // =========================
-  // CREATE CATEGORY
-  // =========================
+ 
   async function createCategory(category) {
     saving.value = true
 
     const response = await axios.post(
       '/api/category',
       {
-        category_name: category.category_name,
+        name: category.category_name,
         description: category.description,
       }
     )
@@ -78,21 +77,20 @@ export function useCategory() {
       return response.data.data
     }
 
-    console.error(response.data.message || 'Failed to create category')
+    console.error(
+      response.data.message || 'Failed to create category'
+    )
 
     return null
   }
 
-  // =========================
-  // UPDATE CATEGORY
-  // =========================
   async function updateCategory(id, category) {
     saving.value = true
 
     const response = await axios.put(
-       '/api/category/${id}',
+      `/api/category/${id}`,
       {
-        category_name: category.category_name,
+        name: category.category_name,
         description: category.description,
       }
     )
@@ -104,17 +102,16 @@ export function useCategory() {
       return response.data.data
     }
 
-    console.error(response.data.message || 'Failed to update category')
+    console.error(
+      response.data.message || 'Failed to update category'
+    )
 
     return null
   }
-
-  // =========================
-  // DELETE CATEGORY
-  // =========================
+ 
   async function deleteCategory(id) {
     const response = await axios.delete(
-       '/api/category/${id}'
+      `/api/category/${id}`
     )
 
     if (response.data.success) {
@@ -122,30 +119,154 @@ export function useCategory() {
       return response.data.data
     }
 
-    console.error(response.data.message || 'Failed to delete category')
+    console.error(
+      response.data.message || 'Failed to delete category'
+    )
 
     return null
   }
+ 
+  async function exportCategory() {
+    try {
+      const userString = localStorage.getItem('user')
 
-  // =========================
-  // GET USER ROLE
-  // =========================
-  async function getUserRole() {
-    const role = localStorage.getItem('userRole')
+      if (!userString) {
+        console.error('User not found')
+        return null
+      }
 
-    if (role) {
-      userRole.value = role
-    } else {
-      userRole.value = 'user'
+      const user = JSON.parse(userString)
+      const branchId = user?.branch_id
+
+      if (!branchId) {
+        console.error('Branch ID not found')
+        return null
+      }
+
+      const response = await axios.get(
+        '/api/category/export',
+        {
+          params: {
+            branch_id: branchId,
+          },
+          responseType: 'blob',
+        }
+      )
+
+      const blob = new Blob(
+        [response.data],
+        {
+          type: 'text/csv;charset=utf-8;',
+        }
+      )
+
+      const url = window.URL.createObjectURL(blob)
+
+      const link = document.createElement('a')
+
+      link.href = url
+      link.download = `categories_branch_${branchId}.csv`
+
+      document.body.appendChild(link)
+
+      link.click()
+
+      link.remove()
+
+      window.URL.revokeObjectURL(url)
+
+      return true
+
+    } catch (error) {
+      console.error('Failed to export categories:', error)
+      return null
     }
-
-    return userRole.value
   }
+ 
+  async function downloadCategoryTemplate() {
+    const response = await axios.get(
+      '/api/category/template',
+      {
+        responseType: 'blob',
+      }
+    )
+
+    const blob = new Blob(
+      [response.data],
+      { type: 'text/csv;charset=utf-8;' }
+    )
+
+    const url = window.URL.createObjectURL(blob)
+
+    const link = document.createElement('a')
+
+    link.href = url
+    link.download = 'categories_template.csv'
+
+    document.body.appendChild(link)
+
+    link.click()
+
+    link.remove()
+
+    window.URL.revokeObjectURL(url)
+  }
+ 
+  async function importCategory(file) {
+  if (!file) {
+    return null
+  }
+
+  if (!file.name.toLowerCase().endsWith('.csv')) {
+    console.error('Only CSV files are allowed')
+    return null
+  }
+
+  importing.value = true
+
+  const formData = new FormData()
+
+  formData.append('file', file)
+
+  const response = await axios.post(
+    '/api/category/import',
+    formData
+  )
+
+  importing.value = false
+
+  if (response.data.success) {
+    await getCategory()
+
+    return response.data
+  }
+
+  console.error(
+    response.data.message || 'Import failed'
+  )
+
+  return null
+}
+ 
+ async function getUserRole() {
+  const user = localStorage.getItem('user')
+
+  if (!user) {
+    return null
+  }
+
+  const userRoles = JSON.parse(user)
+
+  userRole.value =  userRoles.role_name || ''
+ 
+  return userRole.value
+}
 
   return {
     categories,
     loading,
     saving,
+    importing,
     userRole,
 
     getCategory,
@@ -153,6 +274,11 @@ export function useCategory() {
     createCategory,
     updateCategory,
     deleteCategory,
+
+    exportCategory,
+    downloadCategoryTemplate,
+    importCategory,
+
     getUserRole,
   }
 }

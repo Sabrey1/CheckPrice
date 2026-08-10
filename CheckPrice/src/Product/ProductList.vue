@@ -2,20 +2,42 @@
   <div>
     <!-- SEARCH + ADD -->
     <div class="flex align-items-center gap-1 justify-content-between mb-1 btn">
-      <div class="w-8">
+      <div class="w-5">
         <IconField >
           <InputIcon class="pi pi-search" />
           <InputText v-model="searchTerm" class="w-full" placeholder="ស្វែងរកផលិតផល" />
         </IconField>
       </div>
 
-      <div>
+      <div class="flex gap-2">
         <Button
           label="បញ្ចូលទំនិញ"
           severity="success"
           @click="checkLoginAndOpenAdd"
-          class="p-1 py-2 w-full"
+         
         />
+
+          <Button
+            label="នាំចូល CSV"
+            icon="pi pi-upload"
+            :loading="importing"
+          
+            @click="openImport"
+          />
+
+          <Button
+            label="នាំចេញ CSV"
+            icon="pi pi-download"
+            severity="success"
+            @click="exportCategory"
+          />
+
+          <Button
+            label="Template"
+            icon="pi pi-file"
+            severity="secondary"
+            @click="downloadCategoryTemplate"
+          />
       </div>
     </div>
 
@@ -98,7 +120,7 @@
           <div class="flex gap-2 items-center align-items-center justify-content-end">
             <!-- Desktop: show full buttons -->
             <template v-if="!isMobile">
-              <ProductView :product="slotProps.data" />
+              <!-- <ProductView :product="slotProps.data" /> -->
               <Button
                 icon="pi pi-pencil"
                 label="កែប្រែ"

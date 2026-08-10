@@ -2,13 +2,46 @@
   <div>
     <Toast />
     <div class="flex justify-content-end p-3">
-      <Button
-        label="បន្ថែមប្រភេទ"
-        icon="pi pi-plus"
-        severity="success"
-        class="mb-3"
-        @click="checkLoginAndOpenAdd"
-      />
+      <div class="flex gap-2">
+          <Button
+            label="បន្ថែមប្រភេទ"
+            icon="pi pi-plus"
+            severity="success"
+            
+            @click="checkLoginAndOpenAdd"
+          />
+
+          <Button
+            label="នាំចូល CSV"
+            icon="pi pi-upload"
+            :loading="importing"
+            :disabled="userRole !== 'admin'"
+            @click="openImport"
+          />
+
+          <Button
+            label="នាំចេញ CSV"
+            icon="pi pi-download"
+            severity="success"
+            @click="exportCategory"
+          />
+
+          <Button
+            label="Template"
+            icon="pi pi-file"
+            severity="secondary"
+            @click="downloadCategoryTemplate"
+          />
+
+        </div>
+
+        <input
+          ref="fileInput"
+          type="file"
+          accept=".csv"
+          style="display: none"
+          @change="handleImport"
+        />
     </div>
 
     <!-- Add / Edit Dialog -->
@@ -69,6 +102,14 @@
                 :disabled="userRole !== 'admin'"
                 @click="checkLoginAndEdit(slotProps.data)"
               />
+              <Button
+                icon="pi pi-trash"
+                label="លុប"
+                severity="danger"
+                class="p-button-primary"
+                :disabled="userRole !== 'admin'"
+                
+              />
 
             </template>
 
@@ -109,7 +150,27 @@ import Menu from 'primevue/menu'
 
 import { useCategory } from '@/composable/useCategory'
 
-const { getCategory,categories } = useCategory()
+const {
+  categories,
+  loading,
+  saving,
+  importing,
+  userRole,
+
+  getCategory,
+  getCategoryById,
+  createCategory,
+  updateCategory,
+  deleteCategory,
+
+  exportCategory,
+  downloadCategoryTemplate,
+  importCategory,
+
+  getUserRole,
+} = useCategory()
+
+const fileInput = ref(null)
 
 const { isMobile } = useDevice()
 const toast = useToast()
@@ -117,9 +178,7 @@ const confirm = useConfirm()
 const router = useRouter()
 
 // Table / Dialog state
-const visible = ref(false) 
-const loading = ref(false)
-const saving = ref(false)
+const visible = ref(false)  
 
 const categoryName = ref('')
 const description = ref('')
@@ -130,12 +189,17 @@ const menu = ref(null)
 const menuItems = ref([])
 const selectedCategory = ref(null)
 
-// Track logged-in user role
-const userRole = ref('')
+
+
+ 
 
 onMounted(async () => {
-    window.addEventListener('resize', isMobile)
+  window.addEventListener('resize', isMobile)
 
+ 
+  await getUserRole()
+
+ 
   await getCategory() 
 })
 
@@ -143,6 +207,33 @@ onMounted(async () => {
 onBeforeUnmount(() => {
   window.removeEventListener('resize', isMobile)
 })
+
+const openImport = () => {
+  fileInput.value?.click()
+}
+
+const handleImport = async (event) => {
+  const file = event.target.files[0]
+
+  if (!file) {
+    return
+  }
+
+  const result = await importCategory(file)
+
+  if (result?.success) {
+    alert(
+      `Import completed!\n\n` +
+      `Total: ${result.total}\n` +
+      `Inserted: ${result.inserted}\n` +
+      `Skipped: ${result.skipped}`
+    )
+  }
+
+  // Allow selecting the same file again
+  event.target.value = ''
+}
+
 
 const checkLogin = () => {
   const role = userRole.value || localStorage.getItem('userRole')

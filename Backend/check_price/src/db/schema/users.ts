@@ -9,8 +9,8 @@ import { branchs } from "./branch";
 
 export const users = sqliteTable("users", {
     id: integer("id").primaryKey({ autoIncrement: true }),
-    role_id: integer("role_id").notNull(),
-    branch_id: integer("branch_id").notNull(),
+    role_id: integer("role_id").notNull().references(() => roles.id),
+    branch_id: integer("branch_id").notNull().references(() => branchs.id),
     username: text("username").notNull(),
     password: text("password").notNull(),
     full_name: text("full_name"),

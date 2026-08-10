@@ -53,6 +53,7 @@
 import { computed } from 'vue'
 import Avatar from 'primevue/avatar'
 import Dialog from 'primevue/dialog'
+import Button from 'primevue/button'
 
 const props = defineProps({
   product: Object,
