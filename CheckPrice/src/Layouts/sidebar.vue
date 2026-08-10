@@ -20,7 +20,7 @@
             <span>ផលិតផល</span>
           </RouterLink>
         </li>
-        <li>
+        <li v-if="userRole === 'admin'">
           <RouterLink
             to="/category"
             class="flex align-items-center p-3 border-round hover:surface-700 text-white no-underline"

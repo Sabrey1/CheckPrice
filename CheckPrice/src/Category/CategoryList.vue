@@ -93,6 +93,11 @@
 
     <!-- Category Table -->
     <DataTable :value="categories" stripedRows :loading="loading">
+       <template #empty>
+        <div class="text-center p-3">
+          មិនមានទិន្នន័យ
+        </div>
+      </template>
       <Column header="ល.រ">
         <template #body="slotProps">
           {{ slotProps.index + 1 }}
