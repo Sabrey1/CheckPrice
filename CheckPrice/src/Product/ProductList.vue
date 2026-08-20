@@ -576,10 +576,12 @@ async function saveProduct() {
   try {
     const payload = {
       name: productName.value.trim(),
-      sale_price: Number(productPrice.value), 
-      cost_price: Number(costPrice.value),
+      sale_price: productPrice.value.trim(),
+      cost_price: costPrice.value.trim(),
       description: productDescription.value,
-      category_id: Number(selectedCategory.value)
+      category_id: Number(selectedCategory.value),
+
+      created_at: Date.now()
     }
 
     let result
