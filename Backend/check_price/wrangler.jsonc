@@ -6,10 +6,16 @@
 	"d1_databases": [
 		{
 			"binding": "DB",
-			"database_name": "check_price_db",
-			"database_id": "bcd30c94-63f2-4749-bbf0-64290acbe725",
+			"database_name": "testSecuriry",
+			"database_id": "ae5b827c-07f0-4b2f-bf85-aab130854874",
 			"migrations_dir": "drizzle"
 		}
+		// {
+		// 	"binding": "DB",
+		// 	"database_name": "check_price_db",
+		// 	"database_id": "bcd30c94-63f2-4749-bbf0-64290acbe725",
+		// 	"migrations_dir": "drizzle"
+		// }
 	],
 	"ratelimits": [
 		{
