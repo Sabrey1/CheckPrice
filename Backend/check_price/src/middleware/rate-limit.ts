@@ -1,7 +1,9 @@
 import type { Context, MiddlewareHandler } from "hono";
 import type { AppEnv } from "./auth";
 
-const WINDOW_SECONDS = 10;
+const WINDOW_SECONDS = 60;
+const MAX_VIOLATIONS = 5; // Permanent ban after 5 violations
+const VIOLATION_EXPIRY_DAYS = 7; // Reset count after 7 days of good behavior
 
 function clientIp(c: Context<AppEnv>) {
   return (
@@ -16,7 +18,75 @@ function rateLimited(c: Context<AppEnv>, message: string) {
   return c.json({ success: false, message }, 429);
 }
 
+async function checkPermanentBan(c: Context<AppEnv>, ip: string): Promise<boolean> {
+  const banList = c.env.IP_BAN_LIST;
+  if (!banList) {
+    console.warn("IP_BAN_LIST binding is missing - permanent bans disabled");
+    return false;
+  }
+
+  const banRecord = await banList.get(`ban:${ip}`);
+  if (banRecord) {
+    const data = JSON.parse(banRecord);
+    return data.permanent === true;
+  }
+  return false;
+}
+
+async function trackViolation(c: Context<AppEnv>, ip: string) {
+  const banList = c.env.IP_BAN_LIST;
+  if (!banList) {
+    return;
+  }
+
+  const key = `violations:${ip}`;
+  const existing = await banList.get(key);
+
+  let violations = 1;
+  if (existing) {
+    const data = JSON.parse(existing);
+    violations = data.count + 1;
+  }
+
+  // Permanent ban after MAX_VIOLATIONS
+  if (violations >= MAX_VIOLATIONS) {
+    await banList.put(
+      `ban:${ip}`,
+      JSON.stringify({
+        permanent: true,
+        violations: violations,
+        banned_at: new Date().toISOString(),
+        reason: "Exceeded maximum login attempts"
+      })
+    );
+    console.log(`PERMANENT BAN: IP ${ip} banned after ${violations} violations`);
+  } else {
+    // Track violation count (expires after 7 days)
+    const expirySeconds = VIOLATION_EXPIRY_DAYS * 24 * 60 * 60;
+    await banList.put(
+      key,
+      JSON.stringify({ count: violations, last: new Date().toISOString() }),
+      { expirationTtl: expirySeconds }
+    );
+    console.log(`VIOLATION: IP ${ip} - ${violations}/${MAX_VIOLATIONS}`);
+  }
+}
+
 export const loginRateLimiter: MiddlewareHandler<AppEnv> = async (c, next) => {
+  const ip = clientIp(c);
+
+  // Check permanent ban first
+  const isPermanentlyBanned = await checkPermanentBan(c, ip);
+  if (isPermanentlyBanned) {
+    return c.json(
+      {
+        success: false,
+        message: "Your IP address has been permanently banned due to repeated violations. Contact support if you believe this is an error."
+      },
+      403
+    );
+  }
+
   const limiter = c.env.LOGIN_RATE_LIMIT;
 
   // Fail closed: don't silently disable login protection if the binding is missing.
@@ -37,7 +107,7 @@ export const loginRateLimiter: MiddlewareHandler<AppEnv> = async (c, next) => {
     // Invalid JSON: the route will reject it. The IP limit still applies.
   }
 
-  const checks = [limiter.limit({ key: `login:ip:${clientIp(c)}` })];
+  const checks = [limiter.limit({ key: `login:ip:${ip}` })];
   if (username) {
     checks.push(limiter.limit({ key: `login:user:${username}` }));
   }
@@ -45,6 +115,9 @@ export const loginRateLimiter: MiddlewareHandler<AppEnv> = async (c, next) => {
   const results = await Promise.all(checks);
 
   if (results.some((result) => !result.success)) {
+    // Track violation for this IP
+    await trackViolation(c, ip);
+
     return rateLimited(c, "Too many login attempts. Please try again later.");
   }
 

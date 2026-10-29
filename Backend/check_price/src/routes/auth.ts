@@ -18,16 +18,57 @@ login.use("*", loginRateLimiter);
 login.post("/", async (c) => {
   try {
     const db = drizzle(c.env.DB);
-    const body = await c.req.json();
+    let body;
 
-    const username = body.username?.trim();
-    const password = body.password?.trim();
-
-    if (!username || !password) {
+    // Parse and validate JSON
+    try {
+      body = await c.req.json();
+    } catch {
       return c.json(
         {
           success: false,
-          message: "Username and password are required",
+          message: "Invalid JSON format",
+        },
+        400
+      );
+    }
+
+    // Validate input types and structure
+    if (
+      typeof body !== "object" ||
+      body === null ||
+      Array.isArray(body) ||
+      typeof body.username !== "string" ||
+      typeof body.password !== "string"
+    ) {
+      return c.json(
+        {
+          success: false,
+          message: "Username and password must be strings",
+        },
+        400
+      );
+    }
+
+    const username = body.username.trim();
+    const password = body.password.trim();
+
+    // Length validation
+    if (username.length === 0 || username.length > 100) {
+      return c.json(
+        {
+          success: false,
+          message: "Username must be between 1 and 100 characters",
+        },
+        400
+      );
+    }
+
+    if (password.length === 0 || password.length > 100) {
+      return c.json(
+        {
+          success: false,
+          message: "Password must be between 1 and 100 characters",
         },
         400
       );

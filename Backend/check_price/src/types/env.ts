@@ -5,4 +5,5 @@ export interface Env {
   API_RATE_LIMIT: RateLimit;
   API_ROLE_RATE_LIMIT: RateLimit;
   API_BRANCH_RATE_LIMIT: RateLimit;
+  IP_BAN_LIST: KVNamespace;
 }
