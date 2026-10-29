@@ -94,6 +94,7 @@
 </template>
 
 <script setup>
+import  { useAuth } from '@/composable/useAuth'
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import Button from 'primevue/button'
@@ -101,13 +102,14 @@ import Button from 'primevue/button'
 const route = useRoute()
 const router = useRouter()
 
+const { logout: clearSession } = useAuth()
+
 const visible = ref(false)
 const isLoggedIn = ref(false)
 
 const userRole = ref('')
 
-
-  function getUserRole() {
+function getUserRole() {
   const user = localStorage.getItem('user')
 
   if (!user) {
@@ -150,7 +152,7 @@ const login = () => {
 
 /* ✅ Logout */
 const logout = () => {
-  localStorage.removeItem('user')
+  clearSession()
   isLoggedIn.value = false
   router.push('/login')
 }

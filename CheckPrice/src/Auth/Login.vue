@@ -74,16 +74,13 @@ const signIn = async () => {
   loading.value = true
 
   try {
-     
-
     const response = await axios.post('api/login', {
       username: username.value.trim(),
       password: password.value
     })
  
     if (response.data.success) {
-      setUser(response.data.data)
-
+      setUser(response.data.data, response.data.token)
       await router.push('/')
     } else {
       errorMsg.value = response.data.message || 'Login failed'

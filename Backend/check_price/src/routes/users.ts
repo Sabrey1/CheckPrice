@@ -1,10 +1,13 @@
+import { hashPassword } from "../lib/password";
+import type { AppEnv} from '../middleware/auth';
+
 import { Hono } from "hono";
 import { eq } from "drizzle-orm";
 import { getDB } from "../config/db";
 import { users } from "../db/schema/users";
 import type { Env } from "../types/env";
 
-export const RouterUser = new Hono<{ Bindings: Env }>();
+export const RouterUser = new Hono<AppEnv>();
 
 // GET ALL
 RouterUser.get("/", async (c) => {
@@ -38,11 +41,11 @@ RouterUser.post("/", async (c) => {
   const db = getDB(c.env.DB);
   const body = await c.req.json();
 
-  const data = await db.insert(users).values(body).returning().all();
+  const data = await db.insert(users).values({...body, password: await hashPassword(body.password)}).returning().all();
 
   return c.json({
     success: true,
-    data,
+    data: data.map(({ password, ...user }) => user),
   });
 });
 
@@ -52,11 +55,15 @@ RouterUser.put("/:id", async (c) => {
   const id = c.req.param("id");
   const body = await c.req.json();
 
+  if(body.password){
+    body.password = await hashPassword(body.password);
+  }
+
   const data = await db.update(users).set(body).where(eq(users.id, Number(id))).returning().all();
 
   return c.json({
     success: true,
-    data,
+    data: data.map(({ password, ...user }) => user),
   });
 });
 

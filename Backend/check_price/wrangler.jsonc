@@ -10,37 +10,27 @@
 			"database_id": "bcd30c94-63f2-4749-bbf0-64290acbe725",
 			"migrations_dir": "drizzle"
 		}
+	],
+	"ratelimits": [
+		{
+			"name": "LOGIN_RATE_LIMIT",
+			"namespace_id": "1001",
+			"simple": { "limit": 10, "period": 10 }
+		},
+		{
+			"name": "API_RATE_LIMIT",
+			"namespace_id": "1002",
+			"simple": { "limit": 10, "period": 10 }
+		},
+		{
+			"name": "API_ROLE_RATE_LIMIT",
+			"namespace_id": "1003",
+			"simple": { "limit": 10, "period": 10 }
+		},
+		{
+			"name": "API_BRANCH_RATE_LIMIT",
+			"namespace_id": "1004",
+			"simple": { "limit": 10, "period": 10 }
+		}
 	]
-	// "compatibility_flags": [
-	//   "nodejs_compat"
-	// ],
-	// "vars": {
-	//   "MY_VAR": "my-variable"
-	// },
-	// "kv_namespaces": [
-	//   {
-	//     "binding": "MY_KV_NAMESPACE",
-	//     "id": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-	//   }
-	// ],
-	// "r2_buckets": [
-	//   {
-	//     "binding": "MY_BUCKET",
-	//     "bucket_name": "my-bucket"
-	//   }
-	// ],
-	// "d1_databases": [
-	//   {
-	//     "binding": "MY_DB",
-	//     "database_name": "my-database",
-	//     "database_id": ""
-	//   }
-	// ],
-	// "ai": {
-	//   "binding": "AI"
-	// },
-	// "observability": {
-	//   "enabled": true,
-	//   "head_sampling_rate": 1
-	// }
 }

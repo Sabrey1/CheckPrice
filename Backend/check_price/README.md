@@ -7,6 +7,8 @@ npm run dev
 npm run deploy
 ```
 
+<!-- npx wrangler dev -->
+
 [For generating/synchronizing types based on your Worker configuration run](https://developers.cloudflare.com/workers/wrangler/commands/#types):
 
 ```txt

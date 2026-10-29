@@ -1,6 +1,7 @@
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
-
+import { authMiddleware, type AppEnv } from './middleware/auth'
+import { apiRateLimiter } from './middleware/rate-limit'
 
 import { login } from './routes/auth'
 import { Routercategory } from './routes/category'
@@ -9,8 +10,7 @@ import { Routerbranch } from './routes/branch'
 import { RouterRole } from './routes/role'
 import { RouterUser } from './routes/users'
 
-
-const app = new Hono()
+const app = new Hono<AppEnv>()
 
 // Allow CORS
 app.use(
@@ -24,6 +24,21 @@ app.use(
     ],
   })
 )
+
+app.use('/api/*', async (c, next) => {
+  if(c.req.path === '/api/login' || c.req.path === '/api/login/') {
+    return next();
+  }
+  return authMiddleware(c, next);
+})
+
+// Limit authenticated API traffic per user. Login has its own limiter.
+app.use('/api/*', async (c, next) => {
+  if (c.req.path === '/api/login' || c.req.path === '/api/login/') {
+    return next();
+  }
+  return apiRateLimiter(c, next);
+})
 
 app.get('/', (c) => {
   return c.text('Hello Hono!')

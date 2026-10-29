@@ -1,5 +1,5 @@
 // src/router.js
-
+import { useAuth } from '@/composable/useAuth'
 import { createRouter, createWebHistory } from 'vue-router'
 import CategoryList from '@/Category/CategoryList.vue'
 import Products from '@/Product/ProductList.vue'
@@ -7,6 +7,8 @@ import RoleList from '@/Role/Rolelist.vue'
 import UserList from '@/User/UserList.vue'
 import BranchList from '@/Branch/BranchList.vue'
 import Login from '@/Auth/Login.vue'
+import NotFound from '@/NotFound.vue'
+
 // Define routes
 const routes = [
 {
@@ -44,17 +46,28 @@ const routes = [
     component: BranchList,
     meta: { title: 'សាខា' }
   },
-//   {
-//     path: '/:pathMatch(.*)*',
-//     name: 'NotFound',
-//     component: NotFound
-//   }
+  {
+    path: '/:pathMatch(.*)*',
+    name: 'NotFound',
+    component: NotFound
+  }
 ]
 
 // Create router
 const router = createRouter({
   history: createWebHistory(),
   routes
+})
+
+const { isLoggedIn } = useAuth()
+
+router.beforeEach((to) => {
+  if(to.name !== 'Login' && !isLoggedIn()){
+    return { name: 'Login', query: { redirect: to.fullPath }}
+  }
+  if(to.name === 'Login' && isLoggedIn()) {
+    return { name: 'Products' }
+  }
 })
 
 export default router
