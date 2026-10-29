@@ -1,7 +1,7 @@
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { authMiddleware, type AppEnv } from './middleware/auth'
-import { apiRateLimiter } from './middleware/rate-limit'
+import { apiIpRateLimiter, apiRateLimiter } from './middleware/rate-limit'
 
 import { login } from './routes/auth'
 import { Routercategory } from './routes/category'
@@ -24,6 +24,9 @@ app.use(
     ],
   })
 )
+
+// Apply a shared IP limit to every API route, including login and unauthenticated requests.
+app.use('/api/*', apiIpRateLimiter)
 
 app.use('/api/*', async (c, next) => {
   if(c.req.path === '/api/login' || c.req.path === '/api/login/') {

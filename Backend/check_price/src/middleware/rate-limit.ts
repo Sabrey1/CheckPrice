@@ -124,6 +124,22 @@ export const loginRateLimiter: MiddlewareHandler<AppEnv> = async (c, next) => {
   await next();
 };
 
+export const apiIpRateLimiter: MiddlewareHandler<AppEnv> = async (c, next) => {
+  const limiter = c.env.API_RATE_LIMIT;
+
+  if (!limiter) {
+    console.error("API_RATE_LIMIT binding is missing");
+    return c.json({ success: false, message: "Internal server error" }, 500);
+  }
+
+  const result = await limiter.limit({ key: `api:ip:${clientIp(c)}` });
+  if (!result.success) {
+    return rateLimited(c, "Too many requests. Please try again later.");
+  }
+
+  await next();
+};
+
 export const apiRateLimiter: MiddlewareHandler<AppEnv> = async (c, next) => {
   const userLimiter = c.env.API_RATE_LIMIT;
   const roleLimiter = c.env.API_ROLE_RATE_LIMIT;
