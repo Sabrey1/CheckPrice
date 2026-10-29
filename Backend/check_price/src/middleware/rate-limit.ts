@@ -56,7 +56,7 @@ async function trackViolation(c: Context<AppEnv>, ip: string) {
         permanent: true,
         violations: violations,
         banned_at: new Date().toISOString(),
-        reason: "Exceeded maximum login attempts"
+        reason: "Exceeded maximum rate-limit violations"
       })
     );
     console.log(`PERMANENT BAN: IP ${ip} banned after ${violations} violations`);
@@ -125,6 +125,12 @@ export const loginRateLimiter: MiddlewareHandler<AppEnv> = async (c, next) => {
 };
 
 export const apiIpRateLimiter: MiddlewareHandler<AppEnv> = async (c, next) => {
+  const ip = clientIp(c);
+
+  if (await checkPermanentBan(c, ip)) {
+    return c.json({ success: false, message: "IP blocked" }, 403);
+  }
+
   const limiter = c.env.API_RATE_LIMIT;
 
   if (!limiter) {
@@ -132,9 +138,10 @@ export const apiIpRateLimiter: MiddlewareHandler<AppEnv> = async (c, next) => {
     return c.json({ success: false, message: "Internal server error" }, 500);
   }
 
-  const result = await limiter.limit({ key: `api:ip:${clientIp(c)}` });
+  const result = await limiter.limit({ key: `api:ip:${ip}` });
   if (!result.success) {
-    return rateLimited(c, "Too many requests. Please try again later.");
+    await trackViolation(c, ip);
+    return c.json({ success: false, message: "IP blocked" }, 403);
   }
 
   await next();
@@ -173,7 +180,8 @@ export const apiRateLimiter: MiddlewareHandler<AppEnv> = async (c, next) => {
   const results = await Promise.all(checks);
 
   if (results.some((result) => !result.success)) {
-    return rateLimited(c, "Too many requests. Please try again later.");
+    await trackViolation(c, clientIp(c));
+    return c.json({ success: false, message: "IP blocked" }, 403);
   }
 
   await next();
